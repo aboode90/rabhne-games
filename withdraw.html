@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب سحب - Rabhne</title>
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="stylesheet" href="css/animations-light.css?v=2.2">
+    <link rel="stylesheet" href="css/mobile.css?v=2.2">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎮 Rabhne</div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="games.html" class="nav-link">الألعاب</a>
+                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
+                <div id="userMenu">
+                    <span id="userName"></span>
+                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>💰 طلب سحب النقاط</h1>
+                <p>حول نقاطك إلى أموال حقيقية</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="userPoints">0</div>
+                    <div class="stat-label">نقاطك الحالية</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="cashValue">$0.00</div>
+                    <div class="stat-label">القيمة النقدية</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10,000</div>
+                    <div class="stat-label">الحد الأدنى للسحب</div>
+                </div>
+            </div>
+
+            <div class="withdraw-form">
+                <h2>إنشاء طلب سحب جديد</h2>
+
+                <div class="alert alert-info">
+                    <strong>معلومات مهمة:</strong><br>
+                    • الحد الأدنى للسحب: 10,000 نقطة<br>
+                    • سعر التحويل: 1000 نقطة = 0.1$<br>
+                    • يتم مراجعة الطلبات يدوياً خلال 24-48 ساعة<br>
+                    • لا يمكن إلغاء الطلب بعد الإرسال
+                </div>
+
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label for="withdrawPoints">عدد النقاط المراد سحبها:</label>
+                        <input type="number" id="withdrawPoints" min="10000" step="1000" required>
+                        <small>القيمة النقدية: $<span id="calculatedCash">0.00</span></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="withdrawMethod">طريقة السحب:</label>
+                        <select id="withdrawMethod" required>
+                            <option value="USDT">USDT (TRC20)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="withdrawAccount">عنوان المحفظة (Wallet Address):</label>
+                        <input type="text" id="withdrawAccount" placeholder="أدخل عنوان محفظة USDT (TRC20)" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-large btn-primary" id="submitWithdraw">
+                        إرسال طلب السحب
+                    </button>
+                </form>
+            </div>
+
+            <div class="withdraw-history">
+                <h2>تاريخ طلبات السحب</h2>
+                <div id="withdrawHistoryList">
+                    <p>جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🏠</span>
+            <span class="mobile-nav-text">الرئيسية</span>
+        </a>
+        <a href="games.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🎮</span>
+            <span class="mobile-nav-text">الألعاب</span>
+        </a>
+        <a href="dashboard.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📋</span>
+            <span class="mobile-nav-text">لوحتي</span>
+        </a>
+        <a href="withdraw.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">💰</span>
+            <span class="mobile-nav-text">سحب</span>
+        </a>
+    </div>
+
+    <script src="js/firebase-config.js?v=2.2"></script>
+    <script src="js/auth.js?v=2.2"></script>
+    <script src="js/main.js?v=2.2"></script>
+    <script src="js/withdraw.js?v=2.2"></script>
+    <script src="js/pwa.js"></script>
+</body>
+
+</html>

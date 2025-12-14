@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - Rabhne</title>
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="stylesheet" href="css/animations-light.css?v=2.2">
+    <link rel="stylesheet" href="css/mobile.css?v=2.2">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎮 Rabhne</div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="games.html" class="nav-link">الألعاب</a>
+                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
+                <div id="userMenu">
+                    <span id="userName"></span>
+                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>مرحباً، <span id="dashboardUserName">المستخدم</span>!</h1>
+                <p>إدارة حسابك ونقاطك من هنا</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="userPoints">0</div>
+                    <div class="stat-label">إجمالي النقاط</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="dailyPoints">0</div>
+                    <div class="stat-label">نقاط اليوم</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="cashValue">$0.00</div>
+                    <div class="stat-label">القيمة النقدية</div>
+                </div>
+            </div>
+
+            <!-- Ads Banner (New) -->
+            <div
+                style="background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 15px; padding: 15px; margin: 20px 0; color: white; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; font-weight: bold;">💎 نقاط مجانية!</h3>
+                    <p style="margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9;">شاهد إعلانات قصيرة وزد رصيدك</p>
+                </div>
+                <button id="btnWatchAd" onclick="showRewardedAd()"
+                    style="background: white; color: #11998e; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    🎬 شاهد (+10)
+                </button>
+            </div>
+
+            <div class="dashboard-actions">
+                <a href="earn.html" class="btn btn-large btn-primary"
+                    style="background: linear-gradient(45deg, #FFD700, #FFA500); color: black;">💎 المهام</a>
+                <a href="games.html" class="btn btn-large btn-primary">🎮 الألعاب</a>
+                <a href="support.html" class="btn btn-large btn-primary" style="background: #e67e22;">🎧 الدعم</a>
+                <a href="withdraw.html" class="btn btn-large btn-secondary">💰 سحب</a>
+                <a href="profile.html" class="btn btn-large btn-secondary">👤 الملف</a>
+            </div>
+
+            <div class="admin-card">
+                <h2>العمليات الأخيرة</h2>
+                <div id="recentTransactions">
+                    <p>جاري التحميل...</p>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h2>طلبات السحب</h2>
+                <div id="withdrawHistory">
+                    <p>جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🏠</span>
+            <span class="mobile-nav-text">الرئيسية</span>
+        </a>
+        <a href="games.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🎮</span>
+            <span class="mobile-nav-text">الألعاب</span>
+        </a>
+        <a href="dashboard.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📋</span>
+            <span class="mobile-nav-text">لوحتي</span>
+        </a>
+        <a href="withdraw.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">💰</span>
+            <span class="mobile-nav-text">سحب</span>
+        </a>
+    </div>
+
+    <script src="js/firebase-config.js?v=2.2"></script>
+    <script src="js/auth.js?v=2.2"></script>
+    <script src="js/main.js?v=2.2"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/ads.js"></script>
+    <script src="js/pwa.js"></script>
+</body>
+
+</html>

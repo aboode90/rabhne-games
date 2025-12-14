@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الألعاب - Rabhne</title>
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="stylesheet" href="css/animations-light.css?v=2.2">
+    <link rel="stylesheet" href="css/mobile.css?v=2.2">
+
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo float-animation">🎮 Rabhne</div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="games.html" class="nav-link">الألعاب</a>
+                <div id="authButtons">
+                    <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول بجوجل</button>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
+                    <span id="userName"></span>
+                    <a href="dashboard.html" class="btn btn-primary">لوحة التحكم</a>
+                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>🎮 مجموعة الألعاب المتقدمة</h1>
+                <p class="float-animation">🎆 اختر لعبتك المفضلة وابدأ في كسب النقاط فوراً! 💰</p>
+            </div>
+
+            <div class="games-filter">
+                <select id="categoryFilter" onchange="filterGames()">
+                    <option value="">جميع الفئات</option>
+                    <option value="action">أكشن</option>
+                    <option value="puzzle">ألغاز</option>
+                    <option value="racing">سباق</option>
+                    <option value="sports">رياضة</option>
+                    <option value="adventure">مغامرة</option>
+                </select>
+            </div>
+
+            <div id="gamesGrid" class="games-grid">
+                <!-- Games will be loaded here -->
+            </div>
+
+            <div id="loadingGames" class="text-center">
+                <p>جاري تحميل الألعاب...</p>
+            </div>
+        </div>
+    </main>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🏠</span>
+            <span class="mobile-nav-text">الرئيسية</span>
+        </a>
+        <a href="games.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🎮</span>
+            <span class="mobile-nav-text">الألعاب</span>
+        </a>
+        <a href="dashboard.html" class="mobile-nav-item" id="mobileNavDashboard" style="display: none;">
+            <span class="mobile-nav-icon">📋</span>
+            <span class="mobile-nav-text">لوحتي</span>
+        </a>
+        <div class="mobile-nav-item" id="mobileAuthButton" onclick="loginWithGoogle()">
+            <span class="mobile-nav-icon">🔑</span>
+            <span class="mobile-nav-text">دخول</span>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js?v=2.2"></script>
+    <script src="js/auth.js?v=2.2"></script>
+    <script src="js/games.js?v=2.2"></script>
+</body>
+
+</html>

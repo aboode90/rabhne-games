@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own document
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Admin creation (via auth trigger mostly) or new user signup
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Admins can read and write all
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      
+      // SECURE UPDATE: Users can update their own doc BUT limits apply
+      allow update: if request.auth != null && request.auth.uid == userId &&
+        // 1. Cannot change isAdmin or blocked status
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'blocked']) &&
+        // 2. If points are changed, they must be an increment of max 5 (prevents hacking 1M points)
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points']) || 
+          (
+            request.resource.data.points > resource.data.points &&
+            request.resource.data.points <= resource.data.points + 5
+          )
+        ) &&
+        // 3. Daily points logic: Allow increment OR reset (value <= 5)
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['dailyPoints']) ||
+          (
+            // Normal increment
+            (request.resource.data.dailyPoints > resource.data.dailyPoints && request.resource.data.dailyPoints <= resource.data.dailyPoints + 5) ||
+            // Reset for new day (allow setting to small value)
+            request.resource.data.dailyPoints <= 5
+          )
+        );
+    }
+    
+    // Games collection
+    match /games/{gameId} {
+      allow read: if resource.data.isActive == true;
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow update: if request.auth != null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['plays']) &&
+        request.resource.data.plays == resource.data.plays + 1;
+    }
+    
+    // Withdraw requests collection
+    match /withdraw_requests/{requestId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.uid &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.uid is string &&
+        request.resource.data.amountPoints is number &&
+        request.resource.data.amountCash is number &&
+        request.resource.data.method is string &&
+        request.resource.data.account is string;
+      allow update: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Transactions collection
+    match /transactions/{transactionId} {
+      // Users can read their own transactions
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      
+      // FIXED: Allow users to create their own transaction logs
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      
+      // Admins can read all transactions (for dashboard)
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+  }
+    
+    // Support Tickets
+    match /tickets/{ticketId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      allow update: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null; // Simplified, rely on parent ticket access logic in app or add strict checks if needed
+      }
+    }
+  }

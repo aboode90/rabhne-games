@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rabhne - اربح نقاط واسحب كاش</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="stylesheet" href="css/animations-light.css?v=2.2">
+    <link rel="stylesheet" href="css/mobile.css?v=2.2">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269"
+        crossorigin="anonymous"></script>
+    <meta name="google-site-verification" content="l1Dc3xah37rM8ABtqNEp0YoHkC4V8NbBD4ohBj8cy7g" />
+    <meta name="mylead-verification" content="7e3151031f001e7993a7a27d7f929d75">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo float-animation">🎮 Rabhne</div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">الرئيسية</a>
+                <a href="earn.html" class="nav-link" style="color: gold;">💎 المهام</a>
+                <a href="admin/index.html" class="nav-link">لوحة الإدارة</a>
+                <div id="authButtons">
+                    <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول بجوجل</button>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
+                    <span id="userName"></span>
+                    <a href="dashboard.html" class="btn btn-primary">لوحة التحكم</a>
+                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>🎮 العب واربح - منصة الألعاب الرسمية 💰</h1>
+                <p class="float-animation">✨ العب أفضل الألعاب واجمع النقاط وحولها إلى أموال حقيقية بسهولة ✨</p>
+                <div class="hero-buttons">
+                    <a href="games.html" class="btn btn-large btn-primary">🎮 ابدأ اللعب الآن</a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Live Stats Bar (Moved outside for better overlapping) -->
+        <div class="stats-bar float-animation">
+            <div class="stat-item">
+                <span class="stat-value" id="statPlayers">+500</span>
+                <span class="stat-key">لاعب نشط</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-value" id="statPaid">$1,250</span>
+                <span class="stat-key">تم دفعها</span>
+            </div>
+        </div>
+
+        <!-- How it Works Section -->
+        <h2 class="section-title">كيف تربح معنا؟ 🤑</h2>
+        <div class="content-grid">
+            <div class="info-card">
+                <span class="info-icon">👤</span>
+                <h3>1. سجل حسابك</h3>
+                <p>أنشئ حساب مجاني في ثوانٍ وابدأ رحلتك.</p>
+            </div>
+            <div class="info-card">
+                <span class="info-icon">🎮</span>
+                <h3>2. العب واجمع</h3>
+                <p>اختر ألعابك المفضلة واجمع النقاط مع كل دقيقة لعب.</p>
+            </div>
+            <div class="info-card">
+                <span class="info-icon">💸</span>
+                <h3>3. اسحب كاش</h3>
+                <p>حول نقاطك إلى رصيد USDT.</p>
+            </div>
+        </div>
+
+        <!-- Why Us Section -->
+        <h2 class="section-title">لماذا Rabhne؟ ⭐</h2>
+        <div class="content-grid">
+            <div class="info-card">
+                <span class="info-icon">📈</span>
+                <h3>أرباح يومية</h3>
+                <p>فرص متجددة للربح وكسب النقاط على مدار الساعة.</p>
+            </div>
+            <div class="info-card">
+                <span class="info-icon">🔒</span>
+                <h3>آمن 100%</h3>
+                <p>بياناتك وأرباحك محمية بأعلى معايير الأمان.</p>
+            </div>
+        </div>
+
+
+    </main>
+
+    <footer style="background: #2c3e50; color: white; padding: 20px; text-align: center; margin-top: 30px;">
+        <p>تواصل معنا: <a href="mailto:support@rabhne.online"
+                style="color: #3498db; text-decoration: none;">support@rabhne.online</a></p>
+        <p>&copy; 2024 Rabhne. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🏠</span>
+            <span class="mobile-nav-text">الرئيسية</span>
+        </a>
+        <a href="games.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🎮</span>
+            <span class="mobile-nav-text">الألعاب</span>
+        </a>
+        <a href="dashboard.html" class="mobile-nav-item" id="mobileNavDashboard" style="display: none;">
+            <span class="mobile-nav-icon">📋</span>
+            <span class="mobile-nav-text">لوحتي</span>
+        </a>
+        <div class="mobile-nav-item" id="mobileAuthButton" onclick="loginWithGoogle()">
+            <span class="mobile-nav-icon">🔑</span>
+            <span class="mobile-nav-text">دخول</span>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js?v=2.2"></script>
+    <script src="js/auth.js?v=2.2"></script>
+    <script src="js/main.js?v=2.2"></script>
+    <script src="js/stats.js?v=2.2"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
+    <script src="js/pwa.js"></script>
+</body>
+
+</html>

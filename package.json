@@ -1,0 +1,24 @@
+{
+  "name": "rabhne",
+  "version": "1.0.0",
+  "description": "Rabhne - موقع ألعاب HTML5 مع نظام نقاط وسحب يدوي",
+  "main": "index.html",
+  "scripts": {
+    "serve": "firebase serve",
+    "deploy": "firebase deploy",
+    "deploy-hosting": "firebase deploy --only hosting",
+    "deploy-firestore": "firebase deploy --only firestore"
+  },
+  "keywords": [
+    "games",
+    "html5",
+    "firebase",
+    "points",
+    "withdrawal"
+  ],
+  "author": "Rabhne",
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^12.0.0"
+  }
+}

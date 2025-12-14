@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اربح نقاط - Rabhne</title>
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="stylesheet" href="css/mobile.css?v=2.2">
+    <style>
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 120px);
+            /* Adjust based on header/footer */
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+
+        .loading-wall {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎮 Rabhne</div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="games.html" class="nav-link">الألعاب</a>
+                <a href="earn.html" class="nav-link active">العروض</a>
+                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
+                <div id="userMenu">
+                    <span id="userName"></span>
+                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content" style="padding: 20px 0;">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>💎 حائط العروض والمهام</h1>
+                <p>أكمل المهام واحصل على آلاف النقاط!</p>
+            </div>
+
+            <div id="wallContainer">
+                <div class="loading-wall">جاري تجهيز العروض لك...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🏠</span>
+            <span class="mobile-nav-text">الرئيسية</span>
+        </a>
+        <a href="earn.html" class="mobile-nav-item active">
+            <span class="mobile-nav-icon">💎</span>
+            <span class="mobile-nav-text">اربح</span>
+        </a>
+        <a href="dashboard.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📋</span>
+            <span class="mobile-nav-text">لوحتي</span>
+        </a>
+        <a href="support.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">💬</span>
+            <span class="mobile-nav-text">الدعم</span>
+        </a>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js?v=2.2"></script>
+    <script src="js/auth.js?v=2.2"></script>
+    <script>
+        const OFFERWALL_URL = "https://reward-me.eu/68bbf3ce-d8bc-11f0-8770-c2a106037d45";
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('userName').textContent = user.displayName || user.email;
+                
+                // User is logged in, load wall with their ID
+                const wallUrl = `${OFFERWALL_URL}?player_id=${user.uid}`;
+
+                document.getElementById('wallContainer').innerHTML = `
+                    <iframe src="${wallUrl}" 
+                            class="iframe-container"
+                            sandbox="allow-top-navigation allow-scripts allow-same-origin allow-popups allow-forms"
+                            allow="clipboard-write">
+                    </iframe>
+                    <div class="alert alert-info" style="text-align: right; margin-top: 10px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 5px;">
+                        <strong>⚠️ ملاحظة هامة:</strong><br>
+                        النقاط المكتسبة من العروض لا تضاف فوراً.<br>
+                        يتم مراجعة العروض وإضافة النقاط <strong>يدوياً خلال 24 - 48 ساعة</strong>.<br>
+                        يرجى عدم فتح تذكرة قبل مرور هذه المدة.
+                    </div>
+                `;
+            } else {
+                // User not logged in
+                document.getElementById('wallContainer').innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: white; border-radius: 10px;">
+                        <h3>🔒 يجب عليك تسجيل الدخول أولاً</h3>
+                        <p>لرؤية العروض وكسب النقاط، يرجى تسجيل الدخول.</p>
+                        <button class="btn btn-primary" onclick="loginWithGoogle()">تسجيل الدخول</button>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>
