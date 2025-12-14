@@ -1,0 +1,186 @@
+// GameMonetize Integration
+
+const GAMEMONETIZE_CONFIG = {
+    publisherId: 'YOUR_PUBLISHER_ID', // ضع Publisher ID هنا
+    apiKey: 'YOUR_API_KEY', // ضع API Key هنا
+    siteId: 'YOUR_SITE_ID', // ضع Site ID هنا
+    apiUrl: 'https://api.gamemonetize.com/v1'
+};
+
+// جلب الألعاب من GameMonetize
+async function fetchGameMonetizeGames() {
+    try {
+        const response = await fetch(`${GAMEMONETIZE_CONFIG.apiUrl}/games?user_id=${GAMEMONETIZE_CONFIG.publisherId}&format=json`);
+        const data = await response.json();
+        return data.games || [];
+    } catch (error) {
+        console.error('Error fetching GameMonetize games:', error);
+        return [];
+    }
+}
+
+// إضافة ألعاب GameMonetize إلى قاعدة البيانات
+async function syncGameMonetizeGames() {
+    if (!currentUser) return;
+    
+    try {
+        const games = await fetchGameMonetizeGames();
+        const batch = db.batch();
+        
+        games.slice(0, 20).forEach(game => { // أول 20 لعبة
+            const gameRef = db.collection('games').doc(`gm_${game.id}`);
+            batch.set(gameRef, {
+                title: game.title,
+                description: game.description,
+                thumbnail: game.thumb,
+                category: mapGameCategory(game.category),
+                gameUrl: game.url,
+                source: 'gamemonetize',
+                gameId: game.id,
+                width: game.width || 800,
+                height: game.height || 600,
+                active: true,
+                slug: `gm-${game.id}`,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        });
+        
+        await batch.commit();
+        console.log('GameMonetize games synced successfully');
+        
+    } catch (error) {
+        console.error('Error syncing games:', error);
+    }
+}
+
+// تحويل فئات الألعاب
+function mapGameCategory(category) {
+    const categoryMap = {
+        'Action': 'action',
+        'Puzzle': 'puzzle',
+        'Racing': 'racing',
+        'Sports': 'sports',
+        'Adventure': 'adventure'
+    };
+    return categoryMap[category] || 'other';
+}
+
+// إنشاء iframe للعبة مع تتبع الوقت
+function createGameFrame(gameData) {
+    const gameContainer = document.getElementById('gameContainer');
+    if (!gameContainer) return;
+    
+    // إنشاء iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = gameData.gameUrl;
+    iframe.width = gameData.width || '800';
+    iframe.height = gameData.height || '600';
+    iframe.frameBorder = '0';
+    iframe.allowFullscreen = true;
+    iframe.style.cssText = `
+        width: 100%;
+        height: 600px;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    `;
+    
+    gameContainer.innerHTML = '';
+    gameContainer.appendChild(iframe);
+    
+    // بدء تتبع وقت اللعب
+    startGameTracking(gameData.id);
+}
+
+// تتبع وقت اللعب وإضافة النقاط
+let gameStartTime = null;
+let gameTrackingInterval = null;
+
+function startGameTracking(gameId) {
+    if (!currentUser) return;
+    
+    gameStartTime = Date.now();
+    
+    // إضافة نقطة كل دقيقة
+    gameTrackingInterval = setInterval(async () => {
+        try {
+            await addGamePoints(gameId);
+        } catch (error) {
+            console.error('Error adding game points:', error);
+        }
+    }, 60000); // كل دقيقة
+    
+    // تنظيف عند مغادرة الصفحة
+    window.addEventListener('beforeunload', stopGameTracking);
+}
+
+function stopGameTracking() {
+    if (gameTrackingInterval) {
+        clearInterval(gameTrackingInterval);
+        gameTrackingInterval = null;
+    }
+    
+    if (gameStartTime) {
+        const playTime = Math.floor((Date.now() - gameStartTime) / 1000);
+        console.log(`Game played for ${playTime} seconds`);
+        gameStartTime = null;
+    }
+}
+
+// إضافة نقاط اللعب
+async function addGamePoints(gameId) {
+    if (!currentUser) return;
+    
+    try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const userDoc = await userRef.get();
+        const userData = userDoc.data();
+        
+        if (!userData || userData.blocked) return;
+        
+        // التحقق من الحد اليومي
+        const today = new Date().toDateString();
+        const lastClaim = userData.lastClaimAt ? userData.lastClaimAt.toDate() : null;
+        const lastClaimDate = lastClaim ? lastClaim.toDateString() : null;
+        let dailyPoints = userData.dailyPoints || 0;
+        
+        if (lastClaimDate !== today) {
+            dailyPoints = 0;
+        }
+        
+        if (dailyPoints >= 2880) return; // الحد الأقصى اليومي
+        
+        // إضافة نقطة واحدة
+        await userRef.update({
+            points: firebase.firestore.FieldValue.increment(1),
+            dailyPoints: firebase.firestore.FieldValue.increment(1),
+            lastClaimAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // تسجيل المعاملة
+        await db.collection('transactions').add({
+            uid: currentUser.uid,
+            type: 'game_play',
+            pointsDelta: 1,
+            note: `لعب لعبة ${gameId}`,
+            gameId: gameId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // تحديث النقاط في الواجهة
+        updateUserPoints();
+        
+        // إظهار رسالة
+        showMessage('+1 نقطة من اللعب! 🎮', 'success');
+        
+    } catch (error) {
+        console.error('Error adding game points:', error);
+    }
+}
+
+// تحديث النقاط في الواجهة
+function updateUserPoints() {
+    if (getCachedUserData) {
+        loadUserPoints(); // من auth.js
+    }
+}

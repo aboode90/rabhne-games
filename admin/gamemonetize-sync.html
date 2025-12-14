@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزامنة ألعاب GameMonetize - إدارة Rabhne</title>
+    <link rel="stylesheet" href="../css/style.css?v=2.2">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎮 Rabhne Admin</div>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">الرئيسية</a>
+                <a href="index.html" class="nav-link">لوحة الإدارة</a>
+                <a href="games.html" class="nav-link">إدارة الألعاب</a>
+                <a href="gamemonetize-sync.html" class="nav-link active">GameMonetize</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>🎮 مزامنة ألعاب GameMonetize</h1>
+                <p>إدارة ومزامنة الألعاب من منصة GameMonetize</p>
+            </div>
+
+            <div class="admin-card">
+                <h2>⚙️ إعدادات GameMonetize</h2>
+                <div class="form-group">
+                    <label>Publisher ID:</label>
+                    <input type="text" id="publisherId" placeholder="أدخل Publisher ID">
+                </div>
+                <div class="form-group">
+                    <label>API Key:</label>
+                    <input type="text" id="apiKey" placeholder="أدخل API Key">
+                </div>
+                <div class="form-group">
+                    <label>Site ID:</label>
+                    <input type="text" id="siteId" placeholder="أدخل Site ID">
+                </div>
+                <button class="btn btn-primary" onclick="saveConfig()">💾 حفظ الإعدادات</button>
+            </div>
+
+            <div class="admin-card">
+                <h2>🔄 مزامنة الألعاب</h2>
+                <p>اجلب أحدث الألعاب من GameMonetize وأضفها إلى موقعك</p>
+                <div class="sync-controls">
+                    <button class="btn btn-large btn-primary" onclick="syncGames()">
+                        🔄 مزامنة الألعاب الآن
+                    </button>
+                    <button class="btn btn-secondary" onclick="testConnection()">
+                        🔍 اختبار الاتصال
+                    </button>
+                </div>
+                <div id="syncStatus" class="sync-status"></div>
+            </div>
+
+            <div class="admin-card">
+                <h2>📊 إحصائيات الألعاب</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalGames">0</div>
+                        <div class="stat-label">إجمالي الألعاب</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="gmGames">0</div>
+                        <div class="stat-label">ألعاب GameMonetize</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeGames">0</div>
+                        <div class="stat-label">الألعاب النشطة</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h2>🎮 الألعاب المتزامنة</h2>
+                <div id="gamesList" class="games-list">
+                    <p>جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script src="../js/firebase-config.js?v=2.2"></script>
+    <script src="../js/auth.js?v=2.2"></script>
+    <script src="../js/gamemonetize.js?v=2.2"></script>
+    
+    <script>
+        // التحقق من صلاحيات الإدارة
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = '../index.html';
+                return;
+            }
+            
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userData = userDoc.data();
+            
+            if (!userData || !userData.isAdmin) {
+                alert('ليس لديك صلاحيات إدارية');
+                window.location.href = '../index.html';
+                return;
+            }
+            
+            loadGameStats();
+            loadGamesList();
+        });
+
+        // حفظ إعدادات GameMonetize
+        function saveConfig() {
+            const publisherId = document.getElementById('publisherId').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const siteId = document.getElementById('siteId').value;
+            
+            if (!publisherId || !apiKey || !siteId) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            // حفظ في localStorage مؤقتاً (في الإنتاج، احفظها في قاعدة البيانات)
+            localStorage.setItem('gm_publisher_id', publisherId);
+            localStorage.setItem('gm_api_key', apiKey);
+            localStorage.setItem('gm_site_id', siteId);
+            
+            // تحديث الإعدادات في الكود
+            GAMEMONETIZE_CONFIG.publisherId = publisherId;
+            GAMEMONETIZE_CONFIG.apiKey = apiKey;
+            GAMEMONETIZE_CONFIG.siteId = siteId;
+            
+            showMessage('تم حفظ الإعدادات بنجاح!', 'success');
+        }
+
+        // اختبار الاتصال
+        async function testConnection() {
+            const statusEl = document.getElementById('syncStatus');
+            statusEl.innerHTML = '<p>🔍 جاري اختبار الاتصال...</p>';
+            
+            try {
+                const games = await fetchGameMonetizeGames();
+                if (games.length > 0) {
+                    statusEl.innerHTML = `<p style="color: green;">✅ الاتصال ناجح! تم العثور على ${games.length} لعبة</p>`;
+                } else {
+                    statusEl.innerHTML = '<p style="color: orange;">⚠️ الاتصال ناجح لكن لا توجد ألعاب</p>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<p style="color: red;">❌ فشل الاتصال: ${error.message}</p>`;
+            }
+        }
+
+        // مزامنة الألعاب
+        async function syncGames() {
+            const statusEl = document.getElementById('syncStatus');
+            statusEl.innerHTML = '<p>🔄 جاري مزامنة الألعاب...</p>';
+            
+            try {
+                await syncGameMonetizeGames();
+                statusEl.innerHTML = '<p style="color: green;">✅ تم مزامنة الألعاب بنجاح!</p>';
+                loadGameStats();
+                loadGamesList();
+            } catch (error) {
+                statusEl.innerHTML = `<p style="color: red;">❌ فشل في المزامنة: ${error.message}</p>`;
+            }
+        }
+
+        // تحميل إحصائيات الألعاب
+        async function loadGameStats() {
+            try {
+                const gamesSnapshot = await db.collection('games').get();
+                const gmGamesSnapshot = await db.collection('games').where('source', '==', 'gamemonetize').get();
+                const activeGamesSnapshot = await db.collection('games').where('active', '==', true).get();
+                
+                document.getElementById('totalGames').textContent = gamesSnapshot.size;
+                document.getElementById('gmGames').textContent = gmGamesSnapshot.size;
+                document.getElementById('activeGames').textContent = activeGamesSnapshot.size;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // تحميل قائمة الألعاب
+        async function loadGamesList() {
+            try {
+                const gamesSnapshot = await db.collection('games')
+                    .where('source', '==', 'gamemonetize')
+                    .limit(10)
+                    .get();
+                
+                const gamesList = document.getElementById('gamesList');
+                
+                if (gamesSnapshot.empty) {
+                    gamesList.innerHTML = '<p>لا توجد ألعاب GameMonetize</p>';
+                    return;
+                }
+                
+                let html = '';
+                gamesSnapshot.forEach(doc => {
+                    const game = doc.data();
+                    html += `
+                        <div class="game-item">
+                            <img src="${game.thumbnail}" alt="${game.title}" style="width: 100px; height: 60px; object-fit: cover;">
+                            <div>
+                                <h4>${game.title}</h4>
+                                <p>الفئة: ${game.category}</p>
+                                <p>الحالة: ${game.active ? '✅ نشط' : '❌ غير نشط'}</p>
+                            </div>
+                            <div>
+                                <a href="../game.html?slug=${game.slug}" class="btn btn-sm btn-primary">تجربة</a>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                gamesList.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading games list:', error);
+            }
+        }
+
+        // تحميل الإعدادات المحفوظة
+        window.addEventListener('load', () => {
+            const publisherId = localStorage.getItem('gm_publisher_id');
+            const apiKey = localStorage.getItem('gm_api_key');
+            const siteId = localStorage.getItem('gm_site_id');
+            
+            if (publisherId) document.getElementById('publisherId').value = publisherId;
+            if (apiKey) document.getElementById('apiKey').value = apiKey;
+            if (siteId) document.getElementById('siteId').value = siteId;
+        });
+    </script>
+</body>
+</html>
