@@ -358,6 +358,125 @@
     <script src="js/games-admin.js"></script>
     
     <script>
+        // Load games on page load
+        let allGames = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadGamesData();
+        });
+        
+        async function loadGamesData() {
+            try {
+                console.log('Loading games...');
+                const gamesSnapshot = await db.collection('games').get();
+                console.log('Games found:', gamesSnapshot.size);
+                
+                allGames = [];
+                gamesSnapshot.forEach(doc => {
+                    allGames.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                updateStatsDisplay();
+                displayGamesTable();
+                
+            } catch (error) {
+                console.error('Error loading games:', error);
+            }
+        }
+        
+        function updateStatsDisplay() {
+            const totalGames = allGames.length;
+            const activeGames = allGames.filter(game => game.active).length;
+            const totalPlays = allGames.reduce((sum, game) => sum + (game.plays || 0), 0);
+            const categories = new Set(allGames.map(game => game.category)).size;
+            
+            document.getElementById('totalGames').textContent = totalGames;
+            document.getElementById('activeGames').textContent = activeGames;
+            document.getElementById('totalPlays').textContent = totalPlays.toLocaleString();
+            document.getElementById('categoriesCount').textContent = categories;
+        }
+        
+        function displayGamesTable() {
+            const container = document.getElementById('gamesTableContainer');
+            
+            if (allGames.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>لا توجد ألعاب</h3></div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="games-table">
+                    <thead>
+                        <tr>
+                            <th>الصورة</th>
+                            <th>اسم اللعبة</th>
+                            <th>الفئة</th>
+                            <th>مرات اللعب</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allGames.map(game => `
+                            <tr>
+                                <td>
+                                    <img src="${game.thumbnail || 'https://via.placeholder.com/80x60/667eea/ffffff?text=🎮'}" 
+                                         alt="${game.title}" class="game-thumbnail">
+                                </td>
+                                <td>
+                                    <div class="game-title">${game.title}</div>
+                                    <div class="game-slug">/${game.slug}</div>
+                                </td>
+                                <td>${getCategoryNameAr(game.category)}</td>
+                                <td>${(game.plays || 0).toLocaleString()}</td>
+                                <td>
+                                    <span class="status-badge ${game.active ? 'status-active' : 'status-inactive'}">
+                                        ${game.active ? '✅ نشطة' : '❌ معطلة'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteGameNow('${game.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+        
+        function getCategoryNameAr(category) {
+            const categories = {
+                'action': 'أكشن',
+                'puzzle': 'ألغاز',
+                'racing': 'سباق',
+                'sports': 'رياضة',
+                'adventure': 'مغامرة'
+            };
+            return categories[category] || category;
+        }
+        
+        async function deleteGameNow(gameId) {
+            const game = allGames.find(g => g.id === gameId);
+            if (!game) return;
+            
+            if (!confirm(`هل أنت متأكد من حذف لعبة "${game.title}"؟`)) return;
+            
+            try {
+                await db.collection('games').doc(gameId).delete();
+                alert('تم حذف اللعبة بنجاح');
+                await loadGamesData();
+            } catch (error) {
+                alert('خطأ في حذف اللعبة: ' + error.message);
+            }
+        }
+        
         // Simple functions that work immediately
         function showAddGameModal() {
             console.log('Show add game modal clicked');
@@ -476,20 +595,37 @@
             }
             
             try {
-                const existingGame = await db.collection('games').where('slug', '==', gameData.slug).get();
-                if (!existingGame.empty) {
-                    alert('معرف اللعبة مستخدم بالفعل');
-                    return;
+                // تحقق من وجود اللعبة
+                const existingBySlug = await db.collection('games').where('slug', '==', gameData.slug).get();
+                const existingByTitle = await db.collection('games').where('title', '==', gameData.title).get();
+                
+                if (!existingBySlug.empty) {
+                    // تحديث اللعبة الموجودة
+                    const docId = existingBySlug.docs[0].id;
+                    await db.collection('games').doc(docId).update({
+                        ...gameData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('تم تحديث اللعبة بنجاح');
+                } else if (!existingByTitle.empty) {
+                    // تحديث بالعنوان
+                    const docId = existingByTitle.docs[0].id;
+                    await db.collection('games').doc(docId).update({
+                        ...gameData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('تم تحديث اللعبة بنجاح');
+                } else {
+                    // إضافة لعبة جديدة
+                    await db.collection('games').add({
+                        ...gameData,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('تم إضافة اللعبة بنجاح');
                 }
                 
-                await db.collection('games').add({
-                    ...gameData,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                alert('تم إضافة اللعبة بنجاح');
                 closeGameModal();
-                location.reload();
+                await loadGamesData();
                 
             } catch (error) {
                 alert('خطأ في حفظ اللعبة: ' + error.message);
