@@ -10,9 +10,19 @@ const GAMEMONETIZE_CONFIG = {
 // جلب الألعاب من GameMonetize Game Feed
 async function fetchGameMonetizeGames() {
     try {
-        const gameFeedUrl = 'https://gamemonetize.com/feed.php?format=0&num=50&page=1';
-        const response = await fetch(gameFeedUrl);
-        const data = await response.json();
+        const gameFeedUrl = localStorage.getItem('gm_game_feed_url') || 'https://gamemonetize.com/feed.php?format=0&num=50&page=1';
+        const response = await fetch(gameFeedUrl, {
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const text = await response.text();
+        console.log('Raw response:', text);
+        const data = JSON.parse(text);
         return data || [];
     } catch (error) {
         console.error('Error fetching GameMonetize games:', error);
@@ -28,14 +38,19 @@ async function syncGameMonetizeGames() {
         const games = await fetchGameMonetizeGames();
         const batch = db.batch();
         
-        games.slice(0, 20).forEach(game => { // أول 20 لعبة
+        console.log('Games data structure:', games);
+        
+        // التحقق من هيكل البيانات
+        const gamesList = Array.isArray(games) ? games : (games.games || []);
+        
+        gamesList.slice(0, 20).forEach(game => { // أول 20 لعبة
             const gameRef = db.collection('games').doc(`gm_${game.id}`);
             batch.set(gameRef, {
-                title: game.title,
-                description: game.description,
-                thumbnail: game.thumb,
-                category: mapGameCategory(game.category),
-                gameUrl: game.url,
+                title: game.title || game.name || 'لعبة',
+                description: game.description || game.desc || '',
+                thumbnail: game.thumb || game.thumbnail || game.image || '',
+                category: mapGameCategory(game.category || game.cat),
+                gameUrl: game.url || game.game_url || game.link || '',
                 source: 'gamemonetize',
                 gameId: game.id,
                 width: game.width || 800,

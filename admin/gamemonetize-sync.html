@@ -152,13 +152,18 @@
             
             try {
                 const games = await fetchGameMonetizeGames();
-                if (games.length > 0) {
-                    statusEl.innerHTML = `<p style="color: green;">✅ الاتصال ناجح! تم العثور على ${games.length} لعبة</p>`;
+                console.log('Test connection result:', games);
+                
+                const gamesList = Array.isArray(games) ? games : (games.games || []);
+                
+                if (gamesList.length > 0) {
+                    statusEl.innerHTML = `<p style="color: green;">✅ الاتصال ناجح! تم العثور على ${gamesList.length} لعبة</p>`;
                 } else {
-                    statusEl.innerHTML = '<p style="color: orange;">⚠️ الاتصال ناجح لكن لا توجد ألعاب</p>';
+                    statusEl.innerHTML = '<p style="color: orange;">⚠️ الاتصال ناجح لكن لا توجد ألعاب - تحقق من رابط Game Feed</p>';
                 }
             } catch (error) {
-                statusEl.innerHTML = `<p style="color: red;">❌ فشل الاتصال: ${error.message}</p>`;
+                console.error('Connection test error:', error);
+                statusEl.innerHTML = `<p style="color: red;">❌ فشل الاتصال: ${error.message}<br><small>تحقق من رابط Game Feed في حساب GameMonetize</small></p>`;
             }
         }
 
