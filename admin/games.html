@@ -297,54 +297,54 @@
                 <button class="close" onclick="closeGameModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="gameForm">
-                    <div class="form-group">
-                        <label class="form-label">عنوان اللعبة *</label>
-                        <input type="text" id="gameTitle" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">معرف اللعبة (Slug) *</label>
-                        <input type="text" id="gameSlug" class="form-control" required>
-                        <small style="color: #666;">سيتم إنشاؤه تلقائياً من العنوان</small>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">وصف اللعبة</label>
-                        <textarea id="gameDescription" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">رابط اللعبة (iframe) *</label>
-                        <input type="url" id="gameIframe" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">رابط الصورة المصغرة *</label>
-                        <input type="url" id="gameThumbnail" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">الفئة *</label>
-                        <select id="gameCategory" class="form-control" required>
-                            <option value="">اختر الفئة</option>
-                            <option value="action">أكشن</option>
-                            <option value="puzzle">ألغاز</option>
-                            <option value="racing">سباق</option>
-                            <option value="sports">رياضة</option>
-                            <option value="adventure">مغامرة</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" id="gameActive" checked>
-                            <span>اللعبة نشطة</span>
-                        </label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeGameModal()">
-                    <i class="fas fa-times"></i> إلغاء
-                </button>
-                <button type="button" class="btn btn-primary" onclick="saveGameData()">
-                    <i class="fas fa-save"></i> حفظ اللعبة
-                </button>
+                <div class="form-group">
+                    <label class="form-label">عنوان اللعبة *</label>
+                    <input type="text" id="gameTitle" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">معرف اللعبة (Slug) *</label>
+                    <input type="text" id="gameSlug" class="form-control" required>
+                    <small style="color: #666;">سيتم إنشاؤه تلقائياً من العنوان</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">وصف اللعبة</label>
+                    <textarea id="gameDescription" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رابط اللعبة (iframe) *</label>
+                    <input type="url" id="gameIframe" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رابط الصورة المصغرة *</label>
+                    <input type="url" id="gameThumbnail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الفئة *</label>
+                    <select id="gameCategory" class="form-control" required>
+                        <option value="">اختر الفئة</option>
+                        <option value="action">أكشن</option>
+                        <option value="puzzle">ألغاز</option>
+                        <option value="racing">سباق</option>
+                        <option value="sports">رياضة</option>
+                        <option value="adventure">مغامرة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="gameActive" checked>
+                        <span>اللعبة نشطة</span>
+                    </label>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <button type="button" class="btn btn-secondary" onclick="closeGameModal()" style="flex: 1;">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveGameData()" style="flex: 1;">
+                        <i class="fas fa-save"></i> حفظ اللعبة
+                    </button>
+                </div>
             </div>
         </div>
     </div>
