@@ -1,22 +1,16 @@
 {
-  "name": "Rabhne - اربح من الألعاب",
+  "name": "Rabhne Games",
   "short_name": "Rabhne",
-  "description": "اربح نقاط من الألعاب واسحب كاش حقيقي",
+  "description": "موقع ألعاب HTML5 مع نظام نقاط",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2c3e50",
-  "theme_color": "#3498db",
-  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "img/game.jpg",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-512.png", 
-      "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
