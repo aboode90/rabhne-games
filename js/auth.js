@@ -1,12 +1,19 @@
-// Authentication functions
+// توافق مع النظام الجديد
 let currentUser = null;
 let authInitialized = false;
 
-// Check auth state
-auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
-    authInitialized = true;
-    updateUI();
+// فحص حالة التوثيق
+if (window.auth) {
+    auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        authInitialized = true;
+        
+        // استخدام مدير التوثيق الجديد إن وجد
+        if (window.authManager) {
+            window.authManager.currentUser = user;
+        }
+        
+        updateUI();
 
     if (user) {
         try {
@@ -155,14 +162,17 @@ async function checkAdminAccess() {
     }
 }
 
-// Google Login function
+// دالة تسجيل الدخول بجوجل
 async function loginWithGoogle() {
-    try {
-        // Check if already in progress
-        if (auth.currentUser) {
-            showMessage('أنت مسجل دخول بالفعل', 'info');
-            return true;
-        }
+    if (window.authManager) {
+        return await window.authManager.loginWithGoogle();
+    } else {
+        // الطريقة القديمة
+        try {
+            if (auth.currentUser) {
+                showMessage('أنت مسجل دخول بالفعل', 'info');
+                return true;
+            }
 
         showMessage('جاري تسجيل الدخول...', 'info');
 
@@ -203,14 +213,19 @@ function handleAuthError(error) {
     }
 }
 
-// Logout function
+// دالة تسجيل الخروج
 async function logout() {
-    try {
-        await auth.signOut();
-        showMessage('تم تسجيل الخروج بنجاح!', 'success');
-        window.location.href = '/';
-    } catch (error) {
-        showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
+    if (window.authManager) {
+        return await window.authManager.logout();
+    } else {
+        // الطريقة القديمة
+        try {
+            await auth.signOut();
+            showMessage('تم تسجيل الخروج بنجاح!', 'success');
+            window.location.href = '/';
+        } catch (error) {
+            showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
+        }
     }
 }
 

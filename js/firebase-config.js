@@ -1,35 +1,45 @@
-// Firebase Configuration - API keys are safe for client-side use
-// These are public identifiers, not secret keys
-const firebaseConfig = {
-    apiKey: "AIzaSyDSwDU_B4OgMo2gh2vfbX7UEi6Cef9AUZM", // Public API key - safe to expose
-    authDomain: "www.rabhne.online",
-    projectId: "rabhne-game-site",
-    storageBucket: "rabhne-game-site.firebasestorage.app",
-    messagingSenderId: "285444503306",
-    appId: "1:285444503306:web:72ea8d37e5bc34b77a6cf3"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Initialize services
-const auth = firebase.auth();
-const db = firebase.firestore();
+// تحميل الإعدادات من الملف الجديد
+if (window.FIREBASE_CONFIG) {
+    // Initialize Firebase
+    firebase.initializeApp(window.FIREBASE_CONFIG);
+    
+    // Initialize services
+    window.auth = firebase.auth();
+    window.db = firebase.firestore();
+    
+    // إعداد إعدادات Firestore
+    db.settings({
+        cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+    });
+    
+    // تمكين الاستمرارية
+    db.enablePersistence({
+        synchronizeTabs: true
+    }).catch(error => {
+        console.warn('تعذر تمكين الاستمرارية:', error);
+    });
+} else {
+    console.error('إعدادات Firebase غير موجودة');
+}
 
 // Enable Google Auth popup
 auth.useDeviceLanguage();
 
-// App constants - Validated and secure
-const APP_CONFIG = {
-    POINTS_PER_CLAIM: 1, // Points per 30 seconds
-    COOLDOWN_SECONDS: 30, // Minimum time between claims
-    DAILY_LIMIT: 2880, // Max points per day (24h * 60min * 2 points/min)
-    MIN_WITHDRAW: 2000, // Minimum points to withdraw
-    POINTS_TO_DOLLAR: 10000, // 10000 points = $1 USD
-    WITHDRAW_METHODS: ['USDT'], // Supported withdrawal methods
-    MAX_POINTS_PER_UPDATE: 5, // Security: Max points in single update
-    SESSION_TIMEOUT: 3600000, // 1 hour in milliseconds
-    MAX_DAILY_SESSIONS: 100 // Prevent abuse
+// استخدام الإعدادات من الملف الجديد
+const APP_CONFIG = window.APP_CONFIG || {
+    POINTS: {
+        PER_CLAIM: 1,
+        COOLDOWN_SECONDS: 30,
+        DAILY_LIMIT: 2880,
+        MIN_WITHDRAW: 2000,
+        TO_DOLLAR_RATE: 10000,
+        MAX_PER_UPDATE: 5
+    },
+    SECURITY: {
+        SESSION_TIMEOUT: 3600000,
+        MAX_DAILY_SESSIONS: 100
+    },
+    WITHDRAW_METHODS: ['USDT']
 };
 
 // Validate configuration

@@ -1,41 +1,59 @@
-// Main application functions
+// توافق مع النظام الجديد
 
-// Load stats for homepage
+// تحميل إحصائيات الصفحة الرئيسية
 async function loadStats() {
     try {
-        // Count users
-        const usersSnapshot = await db.collection('users').get();
-        const totalUsers = usersSnapshot.size;
-
-        // Count games
-        const gamesSnapshot = await db.collection('games').where('isActive', '==', true).get();
-        const totalGames = gamesSnapshot.size;
-
-        // Count approved withdrawals
-        const withdrawalsSnapshot = await db.collection('withdraw_requests')
-            .where('status', '==', 'approved').get();
-        const totalPayouts = withdrawalsSnapshot.size;
-
-        // Update UI
-        const totalUsersEl = document.getElementById('totalUsers');
-        const totalGamesEl = document.getElementById('totalGames');
-        const totalPayoutsEl = document.getElementById('totalPayouts');
-
-        if (totalUsersEl) totalUsersEl.textContent = totalUsers;
-        if (totalGamesEl) totalGamesEl.textContent = totalGames;
-        if (totalPayoutsEl) totalPayoutsEl.textContent = totalPayouts;
-
+        if (window.appCore && window.appCore.getAppStats) {
+            const stats = await window.appCore.getAppStats();
+            updateStatsDisplay(stats);
+        } else {
+            // الطريقة القديمة كبديل
+            const [usersSnapshot, gamesSnapshot, withdrawalsSnapshot] = await Promise.all([
+                db.collection('users').get(),
+                db.collection('games').where('isActive', '==', true).get(),
+                db.collection('withdraw_requests').where('status', '==', 'approved').get()
+            ]);
+            
+            const stats = {
+                totalUsers: usersSnapshot.size,
+                totalGames: gamesSnapshot.size,
+                totalPayouts: withdrawalsSnapshot.size
+            };
+            
+            updateStatsDisplay(stats);
+        }
     } catch (error) {
         console.error('Error loading stats:', error);
     }
 }
 
-// Points system functions
+// تحديث عرض الإحصائيات
+function updateStatsDisplay(stats) {
+    const elements = {
+        totalUsers: document.getElementById('totalUsers'),
+        totalGames: document.getElementById('totalGames'),
+        totalPayouts: document.getElementById('totalPayouts'),
+        statPlayers: document.getElementById('statPlayers'),
+        statPaid: document.getElementById('statPaid')
+    };
+
+    if (elements.totalUsers) elements.totalUsers.textContent = stats.totalUsers;
+    if (elements.totalGames) elements.totalGames.textContent = stats.totalGames;
+    if (elements.totalPayouts) elements.totalPayouts.textContent = stats.totalPayouts;
+    if (elements.statPlayers) elements.statPlayers.textContent = `+${stats.totalUsers}`;
+    if (elements.statPaid) elements.statPaid.textContent = `$${stats.totalPayouts * 10}`;
+}
+
+// نظام النقاط المحسن
 async function claimPoints(gameSlug) {
-    if (!currentUser) {
-        showMessage('يجب تسجيل الدخول أولاً', 'error');
-        return;
-    }
+    if (window.pointsManager) {
+        return await window.pointsManager.earnPoints(gameSlug);
+    } else {
+        // الطريقة القديمة
+        if (!currentUser) {
+            showMessage('يجب تسجيل الدخول أولاً', 'error');
+            return;
+        }
 
     try {
         const userRef = db.collection('users').doc(currentUser.uid);
@@ -102,12 +120,16 @@ async function claimPoints(gameSlug) {
     }
 }
 
-// Update claim button state
-async function updateClaimButton() {
-    const claimBtn = document.getElementById('claimBtn');
-    const cooldownTimer = document.getElementById('cooldownTimer');
+// تحديث زر المطالبة
+async function updateClaimButton(gameSlug) {
+    if (window.pointsManager) {
+        return await window.pointsManager.updateClaimButton(gameSlug);
+    } else {
+        // الطريقة القديمة
+        const claimBtn = document.getElementById('claimBtn');
+        const cooldownTimer = document.getElementById('cooldownTimer');
 
-    if (!claimBtn || !currentUser) return;
+        if (!claimBtn || !currentUser) return;
 
     try {
         const userDoc = await db.collection('users').doc(currentUser.uid).get();

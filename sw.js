@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rabhne-v2.12'; // Bumping version
+const CACHE_NAME = 'rabhne-v3.0.0';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,16 +6,18 @@ const urlsToCache = [
   '/dashboard.html',
   '/withdraw.html',
   '/admin.html',
-  '/css/style.css?v=2.4',
-  '/css/mobile.css?v=2.4',
-  '/css/animations-light.css?v=2.4',
-  '/js/main.js?v=2.4',
-  '/js/auth.js?v=2.4',
-  '/js/firebase-config.js?v=2.4',
-  '/js/stats.js?v=2.4',
-  '/js/pwa.js',
-  '/js/ads.js',
-  '/js/game.js?v=2.11' // Ensure game.js is fresh
+  '/css/style.css',
+  '/config/app-config.js',
+  '/core/app-core.js',
+  '/core/security/security-manager.js',
+  '/core/utils/ui-manager.js',
+  '/core/auth/auth-manager.js',
+  '/core/api/points-manager.js',
+  '/js/main.js',
+  '/js/auth.js',
+  '/js/firebase-config.js',
+  '/js/game.js',
+  '/manifest.json'
 ];
 
 // Install: Cache files

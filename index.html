@@ -3,15 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rabhne - ألعاب HTML5</title>
-    <meta name="description" content="منصة ألعاب HTML5 عربية - اربح نقاط وانضم إلى مجتمع اللاعبين">
-    <meta name="keywords" content="ألعاب, HTML5, ألعاب عربية, كسب نقاط, ترفيه">
-    <link rel="stylesheet" href="css/style.css?v=2.2">
-    <link rel="stylesheet" href="css/mobile.css?v=2.2">
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="img/game.jpg" type="image/x-icon">
+    <title>Rabhne - منصة الألعاب الاحترافية</title>
+    <meta name="description" content="منصة ألعاب HTML5 عربية احترافية - اربح نقاط حقيقية وحولها إلى أموال">
+    <meta name="keywords" content="ألعاب, HTML5, ألعاب عربية, كسب نقاط, ترفيه, أرباح">
+    <meta name="author" content="Rabhne Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Rabhne - منصة الألعاب الاحترافية">
+    <meta property="og:description" content="العب أفضل الألعاب واربح نقاط حقيقية">
+    <meta property="og:image" content="/img/og-image.jpg">
+    <meta property="og:url" content="https://www.rabhne.online">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/css/style.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" as="style">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     
     <!-- AdSense Code -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
@@ -133,13 +156,26 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-config.js?v=2.2"></script>
-    <script src="js/auth.js?v=2.2"></script>
-    <script src="js/main.js?v=2.2"></script>
-    <script src="js/stats.js?v=2.2"></script>
+    <!-- App Configuration -->
+    <script src="/config/app-config.js"></script>
+    
+    <!-- Core Modules -->
+    <script src="/core/security/security-manager.js"></script>
+    <script src="/core/utils/ui-manager.js"></script>
+    <script src="/core/auth/auth-manager.js"></script>
+    <script src="/core/api/points-manager.js"></script>
+    
+    <!-- App Core -->
+    <script src="/core/app-core.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('📱 تم تسجيل Service Worker');
+                })
+                .catch(error => {
+                    console.error('خطأ في تسجيل Service Worker:', error);
+                });
         }
     </script>
     <script src="js/pwa.js"></script>
