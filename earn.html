@@ -176,25 +176,43 @@
 
         function loadCPALeadWall() {
             if (currentUser) {
-                // Replace with your actual CPALead publisher ID
-                const publisherId = 'YOUR_CPALEAD_PUBLISHER_ID';
+                // استبدل هذا بالمعرف الفعلي من حسابك في CPALead
+                const publisherId = 'YOUR_ACTUAL_CPALEAD_PUBLISHER_ID'; // مثلاً: '123456'
                 const userId = currentUser.uid;
                 
                 document.getElementById('cpaleadContainer').innerHTML = `
                     <div style="text-align: center; padding: 20px;">
                         <h3>🔗 CPALead عروض</h3>
-                        <p>اضغط على الزر أدناه للوصول إلى عروض CPALead</p>
-                        <button class="btn btn-primary" onclick="openCPALeadOffers('${publisherId}', '${userId}')">
-                            فتح عروض CPALead
-                        </button>
+                        <div id="cpalead-offers-container" style="min-height: 400px;">
+                            <button class="btn btn-primary" onclick="loadCPALeadWidget('${publisherId}', '${userId}')">
+                                تحميل عروض CPALead
+                            </button>
+                        </div>
                         <div class="alert alert-info" style="text-align: right; margin-top: 20px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 5px;">
                             <strong>⚠️ ملاحظة هامة:</strong><br>
-                            يجب إكمال العروض مباشرة في نافذة CPALead لضمان احتساب النقاط.<br>
+                            يجب إكمال العروض مباشرة لضمان احتساب النقاط.<br>
                             سيتم احتساب النقاط تلقائياً بعد إكمال العروض.
                         </div>
                     </div>
                 `;
             }
+        }
+
+        function loadCPALeadWidget(publisherId, userId) {
+            // إزالة الزر وإظهار منطقة التحميل
+            const container = document.getElementById('cpalead-offers-container');
+            container.innerHTML = '<p>جاري تحميل العروض...</p>';
+            
+            // تحميل كود CPALead JavaScript
+            const script = document.createElement('script');
+            script.src = `https://cdn.cpalead.com/media/js/widgey.js?pub_id=${publisherId}&subid=${userId}`;
+            script.onload = function() {
+                container.innerHTML = '<div id="cpalead_widget_container"></div>';
+            };
+            script.onerror = function() {
+                container.innerHTML = '<p>حدث خطأ في تحميل العروض. يرجى المحاولة لاحقاً.</p>';
+            };
+            document.head.appendChild(script);
         }
 
         function openCPALeadOffers(publisherId, userId) {
