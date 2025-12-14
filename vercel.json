@@ -24,12 +24,12 @@
   ],
   "rewrites": [
     {
-      "source": "/games/(.*)",
+      "source": "/games/:slug",
       "destination": "/game.html"
     },
     {
-      "source": "/admin/(.*)",
-      "destination": "/admin/$1"
+      "source": "/admin/:path*",
+      "destination": "/admin/:path*"
     }
   ],
   "headers": [

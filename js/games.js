@@ -7,19 +7,18 @@ let filteredGames = [];
 async function loadGames() {
     try {
         console.log('Loading games...');
-        const gamesSnapshot = await db.collection('games').get();
+        const gamesSnapshot = await db.collection('games').where('active', '==', true).get();
         console.log('Games loaded:', gamesSnapshot.size);
 
         allGames = [];
         gamesSnapshot.forEach(doc => {
             const gameData = doc.data();
             console.log('Game data:', gameData);
-            if (gameData.isActive === true) {
-                allGames.push({
-                    id: doc.id,
-                    ...gameData
-                });
-            }
+            allGames.push({
+                id: doc.id,
+                slug: doc.id,
+                ...gameData
+            });
         });
 
         console.log('Active games:', allGames.length);
@@ -46,7 +45,7 @@ function displayGames() {
 
     gamesGrid.innerHTML = filteredGames.map(game => `
         <div class="game-card">
-            <img src="${game.thumbnailUrl || 'img/game.jpg'}" alt="${game.title}" class="game-thumbnail" 
+            <img src="${game.thumbnail || 'img/game.jpg'}" alt="${game.title}" class="game-thumbnail" 
                  onerror="this.src='img/game.jpg'">
             <div class="game-info">
                 <h3 class="game-title">${game.title}</h3>

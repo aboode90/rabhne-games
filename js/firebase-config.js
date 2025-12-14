@@ -1,7 +1,7 @@
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDSwDU_B4OgMo2gh2vfbX7UEi6Cef9AUZM",
-    authDomain: "rabhne-game-site.firebaseapp.com",
+    authDomain: "www.rabhne.online",
     projectId: "rabhne-game-site",
     storageBucket: "rabhne-game-site.firebasestorage.app",
     messagingSenderId: "285444503306",
