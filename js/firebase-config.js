@@ -1,26 +1,24 @@
-// تحميل الإعدادات من الملف الجديد
-if (window.FIREBASE_CONFIG) {
-    // Initialize Firebase
-    firebase.initializeApp(window.FIREBASE_CONFIG);
-    
-    // Initialize services
-    window.auth = firebase.auth();
-    window.db = firebase.firestore();
-    
-    // إعداد إعدادات Firestore
-    db.settings({
-        cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
-    });
-    
-    // تمكين الاستمرارية
-    db.enablePersistence({
-        synchronizeTabs: true
-    }).catch(error => {
-        console.warn('تعذر تمكين الاستمرارية:', error);
-    });
-} else {
-    console.error('إعدادات Firebase غير موجودة');
-}
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDSwDU_B4OgMo2gh2vfbX7UEi6Cef9AUZM",
+    authDomain: "www.rabhne.online",
+    projectId: "rabhne-game-site",
+    storageBucket: "rabhne-game-site.firebasestorage.app",
+    messagingSenderId: "285444503306",
+    appId: "1:285444503306:web:72ea8d37e5bc34b77a6cf3"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Initialize services
+const auth = firebase.auth();
+const db = firebase.firestore();
+window.auth = auth;
+window.db = db;
+
+// Enable Google Auth popup
+auth.useDeviceLanguage();
 
 // Enable Google Auth popup
 auth.useDeviceLanguage();

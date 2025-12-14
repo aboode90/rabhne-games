@@ -1,19 +1,12 @@
-// توافق مع النظام الجديد
+// Authentication functions
 let currentUser = null;
 let authInitialized = false;
 
-// فحص حالة التوثيق
-if (window.auth) {
-    auth.onAuthStateChanged(async (user) => {
-        currentUser = user;
-        authInitialized = true;
-        
-        // استخدام مدير التوثيق الجديد إن وجد
-        if (window.authManager) {
-            window.authManager.currentUser = user;
-        }
-        
-        updateUI();
+// Check auth state
+auth.onAuthStateChanged(async (user) => {
+    currentUser = user;
+    authInitialized = true;
+    updateUI();
 
     if (user) {
         try {
@@ -162,17 +155,36 @@ async function checkAdminAccess() {
     }
 }
 
-// دالة تسجيل الدخول بجوجل
+// Google Login function
 async function loginWithGoogle() {
-    if (window.authManager) {
-        return await window.authManager.loginWithGoogle();
-    } else {
-        // الطريقة القديمة
-        try {
-            if (auth.currentUser) {
-                showMessage('أنت مسجل دخول بالفعل', 'info');
-                return true;
-            }
+    try {
+        if (auth.currentUser) {
+            showMessage('أنت مسجل دخول بالفعل', 'info');
+            return true;
+        }
+
+        showMessage('جاري تسجيل الدخول...', 'info');
+
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('email');
+        provider.addScope('profile');
+        provider.setCustomParameters({
+            prompt: 'select_account'
+        });
+
+        const result = await auth.signInWithPopup(provider);
+        
+        if (result.user) {
+            showMessage(`مرحباً بك ${result.user.displayName || 'مستخدم'}!`, 'success');
+            return true;
+        }
+
+    } catch (error) {
+        console.error('Login error:', error);
+        handleAuthError(error);
+        return false;
+    }
+}
 
         showMessage('جاري تسجيل الدخول...', 'info');
 
@@ -213,19 +225,14 @@ function handleAuthError(error) {
     }
 }
 
-// دالة تسجيل الخروج
+// Logout function
 async function logout() {
-    if (window.authManager) {
-        return await window.authManager.logout();
-    } else {
-        // الطريقة القديمة
-        try {
-            await auth.signOut();
-            showMessage('تم تسجيل الخروج بنجاح!', 'success');
-            window.location.href = '/';
-        } catch (error) {
-            showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
-        }
+    try {
+        await auth.signOut();
+        showMessage('تم تسجيل الخروج بنجاح!', 'success');
+        window.location.href = '/';
+    } catch (error) {
+        showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
     }
 }
 
