@@ -180,13 +180,17 @@
                 const publisherId = '3323222'; // هذا هو المعرف الخاص بك
                 const userId = currentUser.uid;
                 
+                // استخدام iframe بدلاً من JavaScript Widget
                 document.getElementById('cpaleadContainer').innerHTML = `
                     <div style="text-align: center; padding: 20px;">
                         <h3>🔗 CPALead عروض</h3>
-                        <div id="cpalead-offers-container" style="min-height: 400px;">
-                            <button class="btn btn-primary" onclick="loadCPALeadWidget('${publisherId}', '${userId}')">
-                                تحميل عروض CPALead
-                            </button>
+                        <div style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                            <iframe 
+                                src="https://www.cpalead.com/dashboard/pub/offers.php?id=${publisherId}&subid=${userId}" 
+                                style="width: 100%; height: 100%; border: none;"
+                                frameborder="0"
+                                sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
+                            </iframe>
                         </div>
                         <div class="alert alert-info" style="text-align: right; margin-top: 20px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 5px;">
                             <strong>⚠️ ملاحظة هامة:</strong><br>
@@ -196,23 +200,6 @@
                     </div>
                 `;
             }
-        }
-
-        function loadCPALeadWidget(publisherId, userId) {
-            // إزالة الزر وإظهار منطقة التحميل
-            const container = document.getElementById('cpalead-offers-container');
-            container.innerHTML = '<p>جاري تحميل العروض...</p>';
-            
-            // تحميل كود CPALead JavaScript
-            const script = document.createElement('script');
-            script.src = `https://cdn.cpalead.com/media/js/widgey.js?pub_id=${publisherId}&subid=${userId}`;
-            script.onload = function() {
-                container.innerHTML = '<div id="cpalead_widget_container"></div>';
-            };
-            script.onerror = function() {
-                container.innerHTML = '<p>حدث خطأ في تحميل العروض. يرجى المحاولة لاحقاً.</p>';
-            };
-            document.head.appendChild(script);
         }
 
         function openCPALeadOffers(publisherId, userId) {
