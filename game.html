@@ -104,6 +104,9 @@
             </div>
 
             <div class="game-info">
+                <h3>🎥 شرح اللعبة:</h3>
+                <div id="gamemonetize-video"></div>
+                
                 <h3>كيفية اللعب:</h3>
                 <ul>
                     <li>استخدم الماوس أو لوحة المفاتيح للتحكم</li>
@@ -155,6 +158,21 @@
         aclib.runAutoTag({
             zoneId: 'uvhasp50cf',
         });
+    </script>
+    
+    <!-- GameMonetize Video Walkthrough -->
+    <script type="text/javascript">
+       window.VIDEO_OPTIONS = {
+           gameid : "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
+           width  : "100%",
+           height : "480px",
+           color  : "#3f007e",
+           getAds  : "false"
+       };
+       (function (a, b, c) {
+          var d = a.getElementsByTagName(b)[0];
+          a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/video.js", d.parentNode.insertBefore(a, d))
+       })(document, "script", "gamemonetize-video-api"); 
     </script>
 </body>
 

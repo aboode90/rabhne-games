@@ -184,3 +184,22 @@ function updateUserPoints() {
         loadUserPoints(); // من auth.js
     }
 }
+
+// تحديث معرف اللعبة للفيديو التوضيحي
+function updateVideoWalkthrough(gameId) {
+    if (window.VIDEO_OPTIONS && gameId) {
+        window.VIDEO_OPTIONS.gameid = gameId;
+        
+        // إعادة تحميل الفيديو مع المعرف الجديد
+        const existingScript = document.getElementById('gamemonetize-video-api');
+        if (existingScript) {
+            existingScript.remove();
+        }
+        
+        // تحميل الفيديو الجديد
+        (function (a, b, c) {
+            var d = a.getElementsByTagName(b)[0];
+            a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/video.js", d.parentNode.insertBefore(a, d))
+        })(document, "script", "gamemonetize-video-api");
+    }
+}
