@@ -156,41 +156,24 @@ async function checkAdminAccess() {
 }
 
 // Google Login function
-window.loginWithGoogle = async function() {
+function loginWithGoogle() {
     console.log('loginWithGoogle called');
-    try {
-        if (!auth) {
-            console.error('Auth not initialized');
-            alert('Firebase غير مهيأ');
-            return;
-        }
-        
-        if (auth.currentUser) {
-            alert('أنت مسجل دخول بالفعل');
-            return true;
-        }
-
-        alert('جاري تسجيل الدخول...');
-
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('profile');
-        provider.setCustomParameters({
-            prompt: 'select_account'
-        });
-
-        const result = await auth.signInWithPopup(provider);
-        
-        if (result.user) {
-            alert('تم تسجيل الدخول بنجاح!');
-            return true;
-        }
-
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('حدث خطأ في تسجيل الدخول: ' + error.message);
-        return false;
+    
+    if (!window.firebase || !window.auth) {
+        alert('Firebase غير محمل');
+        return;
     }
+    
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            alert('تم تسجيل الدخول بنجاح!');
+        })
+        .catch((error) => {
+            console.error('Login error:', error);
+            alert('خطأ: ' + error.message);
+        });
 }
 
         showMessage('جاري تسجيل الدخول...', 'info');
