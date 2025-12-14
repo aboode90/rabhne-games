@@ -665,3 +665,94 @@ body {
         font-size: 2.5rem;
     }
 }
+
+/* Dashboard specific styles */
+.transaction-item, .withdraw-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    transition: background 0.3s ease;
+}
+
+.transaction-item:hover, .withdraw-item:hover {
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.transaction-item:last-child, .withdraw-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info, .withdraw-info {
+    flex: 1;
+}
+
+.transaction-note, .withdraw-amount {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.transaction-time, .withdraw-method {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.transaction-amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.withdraw-cash {
+    font-size: 0.9rem;
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: rgba(243, 156, 18, 0.2);
+    color: #f39c12;
+}
+
+.status-approved {
+    background: rgba(39, 174, 96, 0.2);
+    color: #27ae60;
+}
+
+.status-rejected {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.no-data, .error-message {
+    text-align: center;
+    padding: 2rem;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.error-message {
+    color: #e74c3c;
+}
+
+/* Loading states */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #7f8c8d;
+}
+
+.loading-spinner {
+    margin-bottom: 1rem;
+}

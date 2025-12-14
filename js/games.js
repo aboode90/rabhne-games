@@ -1,93 +1,173 @@
-// Games page functionality
+// Games page functionality - Optimized
 
 let allGames = [];
 let filteredGames = [];
+let gamesLoaded = false;
 
-// Load games from Firestore
+// Optimized games loading with caching
 async function loadGames() {
+    if (gamesLoaded) return;
+    
+    const loadingEl = document.getElementById('loadingGames');
+    const gamesGrid = document.getElementById('gamesGrid');
+    
     try {
-        console.log('Loading games...');
+        // Show loading
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (gamesGrid) gamesGrid.innerHTML = '';
         
-        // Check if user is authenticated first
-        const user = firebase.auth().currentUser;
-        console.log('Current user:', user ? user.email : 'Not logged in');
+        // Use cached data if available
+        const cachedGames = sessionStorage.getItem('gamesCache');
+        const cacheTime = sessionStorage.getItem('gamesCacheTime');
+        const now = Date.now();
         
-        const gamesSnapshot = await db.collection('games').get();
-        console.log('Games loaded from DB:', gamesSnapshot.size);
+        // Use cache if less than 5 minutes old
+        if (cachedGames && cacheTime && (now - parseInt(cacheTime)) < 300000) {
+            allGames = JSON.parse(cachedGames);
+            filteredGames = [...allGames];
+            displayGames();
+            gamesLoaded = true;
+            if (loadingEl) loadingEl.style.display = 'none';
+            return;
+        }
+        
+        // Load from Firebase with optimized query
+        const gamesSnapshot = await db.collection('games')
+            .where('active', '==', true)
+            .orderBy('title')
+            .get();
 
         allGames = [];
         gamesSnapshot.forEach(doc => {
             const gameData = doc.data();
-            console.log('Game:', doc.id, gameData);
-            
-            // Add all games, check active status
-            if (gameData.active === true) {
-                allGames.push({
-                    id: doc.id,
-                    slug: gameData.slug || doc.id,
-                    ...gameData
-                });
-                console.log('Added active game:', gameData.title);
-            } else {
-                console.log('Skipped inactive game:', gameData.title);
-            }
+            allGames.push({
+                id: doc.id,
+                slug: gameData.slug || doc.id,
+                title: gameData.title || 'لعبة',
+                category: gameData.category || 'other',
+                thumbnail: gameData.thumbnail || null,
+                description: gameData.description || ''
+            });
         });
 
-        console.log('Total active games:', allGames.length);
+        // Cache the results
+        sessionStorage.setItem('gamesCache', JSON.stringify(allGames));
+        sessionStorage.setItem('gamesCacheTime', now.toString());
+        
         filteredGames = [...allGames];
         displayGames();
+        gamesLoaded = true;
 
     } catch (error) {
         console.error('Error loading games:', error);
-        console.error('Error details:', error.code, error.message);
-        showMessage('حدث خطأ أثناء تحميل الألعاب: ' + error.message, 'error');
-        
-        // Show error in games grid
-        const gamesGrid = document.getElementById('gamesGrid');
         if (gamesGrid) {
-            gamesGrid.innerHTML = `<p class="text-center" style="color: red;">خطأ: ${error.message}</p>`;
+            gamesGrid.innerHTML = `
+                <div class="no-games">
+                    <div class="no-games-icon">⚠️</div>
+                    <h3>خطأ في التحميل</h3>
+                    <p>حدث خطأ أثناء تحميل الألعاب</p>
+                    <button class="btn btn-primary" onclick="retryLoadGames()">إعادة المحاولة</button>
+                </div>
+            `;
         }
     } finally {
-        const loadingEl = document.getElementById('loadingGames');
         if (loadingEl) loadingEl.style.display = 'none';
     }
 }
 
-// Display games in grid
+// Retry loading games
+function retryLoadGames() {
+    gamesLoaded = false;
+    sessionStorage.removeItem('gamesCache');
+    sessionStorage.removeItem('gamesCacheTime');
+    loadGames();
+}
+
+// Optimized display function
 function displayGames() {
     const gamesGrid = document.getElementById('gamesGrid');
+    const noGamesEl = document.getElementById('noGamesFound');
+    
+    if (!gamesGrid) return;
 
     if (filteredGames.length === 0) {
-        gamesGrid.innerHTML = '<p class="text-center">لا توجد ألعاب متاحة</p>';
+        gamesGrid.innerHTML = '';
+        if (noGamesEl) noGamesEl.style.display = 'block';
         return;
     }
 
-    gamesGrid.innerHTML = filteredGames.map(game => `
-        <div class="game-card">
-            <img src="${game.thumbnail || 'https://via.placeholder.com/300x200/007bff/ffffff?text=🎮'}" 
+    if (noGamesEl) noGamesEl.style.display = 'none';
+    
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    filteredGames.forEach(game => {
+        const gameCard = document.createElement('div');
+        gameCard.className = 'game-card';
+        gameCard.innerHTML = `
+            <img src="${game.thumbnail || 'https://via.placeholder.com/300x200/3498db/ffffff?text=🎮'}" 
                  alt="${game.title}" 
-                 class="game-thumbnail" 
-                 onerror="this.src='https://via.placeholder.com/300x200/007bff/ffffff?text=🎮'">
+                 class="game-image"
+                 loading="lazy"
+                 onerror="this.src='https://via.placeholder.com/300x200/3498db/ffffff?text=🎮'">
             <div class="game-info">
                 <h3 class="game-title">${game.title}</h3>
-                <p class="game-category">${getCategoryName(game.category)}</p>
-                <a href="game.html?slug=${game.slug}" class="btn btn-primary">العب الآن</a>
+                <div class="game-meta">
+                    <span class="game-category">${getCategoryName(game.category)}</span>
+                    <span class="game-points">+1 نقطة/دقيقة</span>
+                </div>
+                <div class="game-actions">
+                    <a href="game.html?slug=${game.slug}" class="btn btn-primary">🎮 العب الآن</a>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+        fragment.appendChild(gameCard);
+    });
+    
+    gamesGrid.innerHTML = '';
+    gamesGrid.appendChild(fragment);
 }
 
-// Filter games by category
-function filterGames() {
-    const categoryFilter = document.getElementById('categoryFilter');
-    const selectedCategory = categoryFilter.value;
-
-    if (selectedCategory === '') {
+// Filter by category with buttons
+function filterByCategory(category) {
+    // Update active button
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-category="${category}"]`).classList.add('active');
+    
+    // Filter games
+    if (category === '') {
         filteredGames = [...allGames];
     } else {
-        filteredGames = allGames.filter(game => game.category === selectedCategory);
+        filteredGames = allGames.filter(game => game.category === category);
     }
+    
+    displayGames();
+}
 
+// Search games
+function searchGames() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    if (searchTerm === '') {
+        filteredGames = [...allGames];
+    } else {
+        filteredGames = allGames.filter(game => 
+            game.title.toLowerCase().includes(searchTerm) ||
+            getCategoryName(game.category).toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    displayGames();
+}
+
+// Clear search
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    filteredGames = [...allGames];
     displayGames();
 }
 
@@ -95,25 +175,25 @@ function filterGames() {
 function getCategoryName(category) {
     const categories = {
         'action': 'أكشن',
-        'puzzle': 'ألغاز',
+        'puzzle': 'ألغاز', 
         'racing': 'سباق',
         'sports': 'رياضة',
-        'adventure': 'مغامرة'
+        'adventure': 'مغامرة',
+        'other': 'أخرى'
     };
-
     return categories[category] || category;
 }
 
-// Initialize games page
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Games page DOM loaded');
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Load games immediately
+    loadGames();
     
-    // Wait for Firebase to initialize
-    firebase.auth().onAuthStateChanged((user) => {
-        console.log('Auth state changed:', user ? user.email : 'No user');
-        loadGames();
-    });
-    
-    // Also try loading immediately
-    setTimeout(loadGames, 1000);
+    // Update games count in stats
+    setTimeout(() => {
+        const totalGamesCount = document.getElementById('totalGamesCount');
+        if (totalGamesCount && allGames.length > 0) {
+            totalGamesCount.textContent = `${allGames.length}+`;
+        }
+    }, 1000);
 });
