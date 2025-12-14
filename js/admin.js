@@ -27,6 +27,12 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
+// Load Dashboard Data
+async function loadAdminDashboard() {
+    loadPendingWithdrawals();
+    loadAdminStats();
+}
+
 // Function to add Foxy Eco Sort game
 async function addFoxyEcoSortGame() {
     const gameData = {
@@ -57,14 +63,6 @@ async function addFoxyEcoSortGame() {
     } catch (error) {
         console.error('Error adding game:', error);
     }
-}
-
-// Load Dashboard Data
-async function loadAdminDashboard() {
-    loadPendingWithdrawals();
-    loadAdminStats();
-    // Add Foxy Eco Sort game when admin dashboard loads
-    addFoxyEcoSortGame();
 }
 
 // Load Pending Withdrawals
