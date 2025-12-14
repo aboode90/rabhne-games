@@ -136,6 +136,24 @@
     <script src="js/simple-game.js?v=2.2"></script>
     <script src="js/game.js?v=2.2"></script>
     <script src="js/pwa.js"></script>
+    <!-- AdCash AutoTag Code -->
+    <script type="text/javascript">
+        (function() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://aclib.com/aclib.js';
+            script.async = true;
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                if (typeof aclib !== 'undefined') {
+                    aclib.runAutoTag({
+                        zoneId: 'i1fuiapxvc',
+                    });
+                }
+            };
+        })();
+    </script>
 </body>
 
 </html>
