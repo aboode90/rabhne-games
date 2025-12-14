@@ -2,12 +2,37 @@
 
 let allGames = [];
 
+// Expose functions to global scope immediately
+window.showAddGame = showAddGame;
+window.closeModal = closeModal;
+window.toggleGame = toggleGame;
+window.editGame = editGame;
+window.deleteGame = deleteGame;
+
+// Check admin access on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Expose functions immediately to ensure they're available
+    window.showAddGame = showAddGame;
+    window.closeModal = closeModal;
+    window.toggleGame = toggleGame;
+    window.editGame = editGame;
+    window.deleteGame = deleteGame;
+    
     setTimeout(async () => {
-        const isAdmin = await requireAdmin();
-        if (isAdmin) {
-            loadGames();
-            setupForms();
+        try {
+            const isAdmin = await requireAdmin();
+            if (isAdmin) {
+                loadGames();
+                setupForms();
+            }
+        } catch (error) {
+            console.error('Error initializing admin functions:', error);
+            // Still expose functions even if admin check fails
+            window.showAddGame = showAddGame;
+            window.closeModal = closeModal;
+            window.toggleGame = toggleGame;
+            window.editGame = editGame;
+            window.deleteGame = deleteGame;
         }
     }, 1000);
 });
