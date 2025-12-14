@@ -34,7 +34,7 @@
                         <thead>
                             <tr>
                                 <th>الصورة</th>
-                                <th>العنوان</th>
+                                <th>الاسم</th>
                                 <th>الفئة</th>
                                 <th>مرات اللعب</th>
                                 <th>الحالة</th>
@@ -42,7 +42,9 @@
                             </tr>
                         </thead>
                         <tbody id="gamesTableBody">
-                            <tr><td colspan="6">جاري التحميل...</td></tr>
+                            <tr>
+                                <td colspan="6" style="text-align:center">جاري التحميل...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -100,5 +102,21 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="js/games-admin.js"></script>
+    
+    <!-- Ensure functions are available globally -->
+    <script>
+        // Make sure all admin functions are available globally
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for auth to be initialized
+            setTimeout(function() {
+                if (typeof showAddGame !== 'undefined') {
+                    // Functions are already available
+                    console.log('Admin functions ready');
+                } else {
+                    console.log('Waiting for admin functions...');
+                }
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
