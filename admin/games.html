@@ -102,5 +102,69 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="js/games-admin.js"></script>
+    
+    <!-- Utility functions -->
+    <script>
+        // Show message helper function
+        function showMessage(message, type = 'info') {
+            // Create message element if it doesn't exist
+            let messageEl = document.getElementById('admin-message');
+            if (!messageEl) {
+                messageEl = document.createElement('div');
+                messageEl.id = 'admin-message';
+                messageEl.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    color: white;
+                    font-weight: bold;
+                    z-index: 10000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    max-width: 300px;
+                `;
+                document.body.appendChild(messageEl);
+            }
+            
+            // Set message content and style
+            messageEl.textContent = message;
+            
+            // Set color based on type
+            switch(type) {
+                case 'success':
+                    messageEl.style.backgroundColor = '#4CAF50';
+                    break;
+                case 'error':
+                    messageEl.style.backgroundColor = '#f44336';
+                    break;
+                case 'warning':
+                    messageEl.style.backgroundColor = '#ff9800';
+                    break;
+                default:
+                    messageEl.style.backgroundColor = '#2196F3';
+            }
+            
+            // Show message
+            messageEl.style.display = 'block';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Logout function
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = '../index.html';
+                }).catch((error) => {
+                    console.error('Error signing out:', error);
+                    showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
+                });
+            }
+        }
+    </script>
 </body>
 </html>

@@ -18,15 +18,33 @@ document.addEventListener('DOMContentLoaded', function() {
     window.editGame = editGame;
     window.deleteGame = deleteGame;
     
+    // Add debug logging
+    console.log('Games admin page loaded');
+    
     setTimeout(async () => {
         try {
+            console.log('Checking admin access...');
+            // Check if requireAdmin is available
+            if (typeof requireAdmin !== 'function') {
+                console.error('requireAdmin function not available');
+                showMessage('خطأ في تحميل النظام الإداري', 'error');
+                return;
+            }
+            
             const isAdmin = await requireAdmin();
+            console.log('Admin check result:', isAdmin);
+            
             if (isAdmin) {
+                console.log('Loading games...');
                 loadGames();
                 setupForms();
+            } else {
+                console.log('User is not admin');
+                showMessage('ليس لديك صلاحية للوصول لهذه الصفحة', 'error');
             }
         } catch (error) {
             console.error('Error initializing admin functions:', error);
+            showMessage('حدث خطأ أثناء تحميل الصفحة الإدارية: ' + error.message, 'error');
             // Still expose functions even if admin check fails
             window.showAddGame = showAddGame;
             window.closeModal = closeModal;
@@ -39,10 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadGames() {
     try {
+        console.log('Loading games from database...');
         const gamesSnapshot = await db.collection('games')
             .orderBy('createdAt', 'desc')
             .get();
         
+        console.log('Games loaded:', gamesSnapshot.size);
         allGames = [];
         gamesSnapshot.forEach(doc => {
             allGames.push({
@@ -55,12 +75,15 @@ async function loadGames() {
         
     } catch (error) {
         console.error('Error loading games:', error);
-        document.getElementById('gamesTableBody').innerHTML = '<tr><td colspan="6">حدث خطأ أثناء التحميل</td></tr>';
+        showMessage('حدث خطأ أثناء تحميل الألعاب: ' + error.message, 'error');
+        document.getElementById('gamesTableBody').innerHTML = '<tr><td colspan="6">حدث خطأ أثناء التحميل: ' + error.message + '</td></tr>';
     }
 }
 
 function displayGames() {
     const tbody = document.getElementById('gamesTableBody');
+    
+    console.log('Displaying games, count:', allGames.length);
     
     if (allGames.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6">لا توجد ألعاب</td></tr>';
@@ -124,6 +147,7 @@ function setupForms() {
 }
 
 function showAddGame() {
+    console.log('Showing add game modal');
     const form = document.getElementById('addGameForm');
     const modal = document.getElementById('addGameModal');
     
@@ -164,7 +188,7 @@ async function handleAddGame(e) {
         
     } catch (error) {
         console.error('Error adding game:', error);
-        showMessage('حدث خطأ أثناء إضافة اللعبة', 'error');
+        showMessage('حدث خطأ أثناء إضافة اللعبة: ' + error.message, 'error');
     }
 }
 
@@ -182,7 +206,7 @@ async function toggleGame(gameId, isActive) {
         
     } catch (error) {
         console.error('Error toggling game:', error);
-        showMessage(`حدث خطأ أثناء ${action} اللعبة`, 'error');
+        showMessage(`حدث خطأ أثناء ${action} اللعبة: ' + error.message, 'error');
     }
 }
 
@@ -197,7 +221,7 @@ async function deleteGame(gameId) {
         
     } catch (error) {
         console.error('Error deleting game:', error);
-        showMessage('حدث خطأ أثناء حذف اللعبة', 'error');
+        showMessage('حدث خطأ أثناء حذف اللعبة: ' + error.message, 'error');
     }
 }
 
@@ -246,7 +270,7 @@ async function updateGame(gameId) {
         
     } catch (error) {
         console.error('Error updating game:', error);
-        showMessage('حدث خطأ أثناء تحديث اللعبة', 'error');
+        showMessage('حدث خطأ أثناء تحديث اللعبة: ' + error.message, 'error');
     }
 }
 
@@ -281,9 +305,59 @@ function closeModal(modalId) {
     }
 }
 
+// Show message helper function
+function showMessage(message, type = 'info') {
+    // Create message element if it doesn't exist
+    let messageEl = document.getElementById('admin-message');
+    if (!messageEl) {
+        messageEl = document.createElement('div');
+        messageEl.id = 'admin-message';
+        messageEl.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+        `;
+        document.body.appendChild(messageEl);
+    }
+    
+    // Set message content and style
+    messageEl.textContent = message;
+    
+    // Set color based on type
+    switch(type) {
+        case 'success':
+            messageEl.style.backgroundColor = '#4CAF50';
+            break;
+        case 'error':
+            messageEl.style.backgroundColor = '#f44336';
+            break;
+        case 'warning':
+            messageEl.style.backgroundColor = '#ff9800';
+            break;
+        default:
+            messageEl.style.backgroundColor = '#2196F3';
+    }
+    
+    // Show message
+    messageEl.style.display = 'block';
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        messageEl.style.display = 'none';
+    }, 3000);
+}
+
 // Make functions globally available
 window.showAddGame = showAddGame;
 window.closeModal = closeModal;
 window.toggleGame = toggleGame;
 window.editGame = editGame;
 window.deleteGame = deleteGame;
+window.showMessage = showMessage;
