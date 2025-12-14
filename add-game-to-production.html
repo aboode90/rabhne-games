@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إضافة اللعبة للموقع المباشر</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .btn { padding: 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; width: 100%; }
+        .message { padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🎮 إضافة Foxy Eco Sort للموقع المباشر</h1>
+    <p>هذه الصفحة ستضيف اللعبة لقاعدة البيانات المباشرة</p>
+    
+    <div id="message" class="message" style="display: none;"></div>
+    
+    <button id="loginBtn" class="btn" onclick="loginWithGoogle()">🔑 تسجيل الدخول</button>
+    <button id="addBtn" class="btn" onclick="addGameToProduction()" style="display: none;">➕ إضافة اللعبة للموقع المباشر</button>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        let currentUser = null;
+
+        async function loginWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                currentUser = result.user;
+                showMessage('تم تسجيل الدخول: ' + user.email, 'success');
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('addBtn').style.display = 'block';
+            } catch (error) {
+                showMessage('خطأ: ' + error.message, 'error');
+            }
+        }
+
+        async function addGameToProduction() {
+            if (!currentUser) {
+                showMessage('يجب تسجيل الدخول أولاً', 'error');
+                return;
+            }
+
+            try {
+                const gameData = {
+                    title: "Foxy Eco Sort",
+                    slug: "foxy-eco-sort",
+                    iframeUrl: "https://html5.gamedistribution.com/rvvASWA4/8e3527971f5c4457b0691897f02111bb/index.html",
+                    thumbnail: "https://img.gamedistribution.com/8e3527971f5c4457b0691897f02111bb-512x384.jpeg",
+                    category: "puzzle",
+                    active: true,
+                    plays: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const docRef = await db.collection('games').add(gameData);
+                showMessage('✅ تمت إضافة اللعبة بنجاح!\nالمعرف: ' + docRef.id, 'success');
+                
+            } catch (error) {
+                showMessage('❌ خطأ: ' + error.message, 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+        }
+
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('addBtn').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -104,15 +104,15 @@ function displayGames() {
             <td>${getCategoryName(game.category)}</td>
             <td>${(game.plays || 0).toLocaleString()}</td>
             <td>
-                <span class="${game.isActive ? 'status-approved' : 'status-rejected'}">
-                    ${game.isActive ? 'نشطة' : 'معطلة'}
+                <span class="${game.active ? 'status-approved' : 'status-rejected'}">
+                    ${game.active ? 'نشطة' : 'معطلة'}
                 </span>
             </td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn btn-small ${game.isActive ? 'btn-warning' : 'btn-success'}" 
-                            onclick="toggleGame('${game.id}', ${game.isActive})">
-                        ${game.isActive ? 'تعطيل' : 'تفعيل'}
+                    <button class="btn btn-small ${game.active ? 'btn-warning' : 'btn-success'}" 
+                            onclick="toggleGame('${game.id}', ${game.active})">
+                        ${game.active ? 'تعطيل' : 'تفعيل'}
                     </button>
                     <button class="btn btn-small btn-primary" onclick="editGame('${game.id}')">تعديل</button>
                     <button class="btn btn-small btn-danger" onclick="deleteGame('${game.id}')">حذف</button>
@@ -164,7 +164,7 @@ async function handleAddGame(e) {
         iframeUrl: document.getElementById('gameIframe').value,
         thumbnailUrl: document.getElementById('gameThumbnail').value,
         category: document.getElementById('gameCategory').value,
-        isActive: document.getElementById('gameActive').checked,
+        active: document.getElementById('gameActive').checked,
         plays: 0,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -198,7 +198,7 @@ async function toggleGame(gameId, isActive) {
     
     try {
         await db.collection('games').doc(gameId).update({
-            isActive: !isActive
+            active: !isActive
         });
         
         showMessage(`تم ${action} اللعبة بنجاح`, 'success');
@@ -235,7 +235,7 @@ function editGame(gameId) {
     document.getElementById('gameIframe').value = game.iframeUrl;
     document.getElementById('gameThumbnail').value = game.thumbnailUrl;
     document.getElementById('gameCategory').value = game.category;
-    document.getElementById('gameActive').checked = game.isActive;
+    document.getElementById('gameActive').checked = game.active;
     
     // Change form to edit mode
     const form = document.getElementById('addGameForm');
@@ -257,7 +257,7 @@ async function updateGame(gameId) {
         iframeUrl: document.getElementById('gameIframe').value,
         thumbnailUrl: document.getElementById('gameThumbnail').value,
         category: document.getElementById('gameCategory').value,
-        isActive: document.getElementById('gameActive').checked
+        active: document.getElementById('gameActive').checked
     };
     
     try {
