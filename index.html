@@ -49,7 +49,7 @@
                 <a href="admin/index.html" class="nav-link">لوحة الإدارة</a>
                 
                 <div id="authButtons">
-                    <button class="btn btn-primary" id="loginButton">🔑 تسجيل الدخول</button>
+                    <button class="btn btn-primary" onclick="alert('Button clicked'); window.loginWithGoogle();">🔑 تسجيل الدخول</button>
                 </div>
                 
                 <div id="userMenu" style="display: none;">
@@ -148,7 +148,7 @@
             <span class="mobile-nav-icon">📋</span>
             <span class="mobile-nav-text">لوحتي</span>
         </a>
-        <div class="mobile-nav-item" id="mobileAuthButton">
+        <div class="mobile-nav-item" onclick="alert('Mobile clicked'); window.loginWithGoogle();">
             <span class="mobile-nav-icon">🔑</span>
             <span class="mobile-nav-text">دخول</span>
         </div>
@@ -175,32 +175,8 @@
             }
         });
         
-        // Setup event listeners
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                const loginBtn = document.getElementById('loginButton');
-                const logoutBtn = document.getElementById('logoutButton');
-                const mobileAuthBtn = document.getElementById('mobileAuthButton');
-                
-                if (loginBtn) {
-                    loginBtn.onclick = function() {
-                        console.log('Login button clicked');
-                        loginWithGoogle();
-                    };
-                }
-                
-                if (logoutBtn) {
-                    logoutBtn.onclick = logout;
-                }
-                
-                if (mobileAuthBtn) {
-                    mobileAuthBtn.onclick = function() {
-                        console.log('Mobile login clicked');
-                        loginWithGoogle();
-                    };
-                }
-            }, 1000);
-        });
+        // Simple test
+        console.log('Script loaded');
         
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
