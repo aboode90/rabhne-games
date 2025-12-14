@@ -75,23 +75,35 @@ function displayGames() {
 }
 
 function setupForms() {
-    document.getElementById('addGameForm').addEventListener('submit', handleAddGame);
+    const form = document.getElementById('addGameForm');
+    if (form) {
+        form.addEventListener('submit', handleAddGame);
+    }
     
     // Auto-generate slug from title
-    document.getElementById('gameTitle').addEventListener('input', (e) => {
-        const slug = e.target.value
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim();
-        document.getElementById('gameSlug').value = slug;
-    });
+    const titleInput = document.getElementById('gameTitle');
+    if (titleInput) {
+        titleInput.addEventListener('input', (e) => {
+            const slug = e.target.value
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim();
+            const slugInput = document.getElementById('gameSlug');
+            if (slugInput) {
+                slugInput.value = slug;
+            }
+        });
+    }
 }
 
 function showAddGame() {
-    document.getElementById('addGameForm').reset();
-    document.getElementById('addGameModal').style.display = 'block';
+    const form = document.getElementById('addGameForm');
+    const modal = document.getElementById('addGameModal');
+    
+    if (form) form.reset();
+    if (modal) modal.style.display = 'block';
 }
 
 async function handleAddGame(e) {
@@ -215,9 +227,14 @@ async function updateGame(gameId) {
 
 function resetForm() {
     const form = document.getElementById('addGameForm');
-    form.onsubmit = handleAddGame;
-    document.querySelector('#addGameModal h2').textContent = 'إضافة لعبة جديدة';
-    document.querySelector('#addGameForm button').textContent = 'إضافة اللعبة';
+    if (form) {
+        form.onsubmit = handleAddGame;
+        const titleElement = document.querySelector('#addGameModal h2');
+        const buttonElement = document.querySelector('#addGameForm button');
+        
+        if (titleElement) titleElement.textContent = 'إضافة لعبة جديدة';
+        if (buttonElement) buttonElement.textContent = 'إضافة اللعبة';
+    }
 }
 
 function getCategoryName(category) {
@@ -232,8 +249,16 @@ function getCategoryName(category) {
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = 'none';
     if (modalId === 'addGameModal') {
         resetForm();
     }
 }
+
+// Make functions globally available
+window.showAddGame = showAddGame;
+window.closeModal = closeModal;
+window.toggleGame = toggleGame;
+window.editGame = editGame;
+window.deleteGame = deleteGame;
