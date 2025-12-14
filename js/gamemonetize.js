@@ -1,18 +1,19 @@
 // GameMonetize Integration
 
 const GAMEMONETIZE_CONFIG = {
-    publisherId: 'YOUR_PUBLISHER_ID', // ضع Publisher ID هنا
-    apiKey: 'YOUR_API_KEY', // ضع API Key هنا
-    siteId: 'YOUR_SITE_ID', // ضع Site ID هنا
-    apiUrl: 'https://api.gamemonetize.com/v1'
+    gameFeedUrl: 'https://gamemonetize.com/feed.php?format=0&num=50&page=1',
+    publisherId: 'YOUR_PUBLISHER_ID',
+    apiKey: 'YOUR_API_KEY', 
+    siteId: 'YOUR_SITE_ID'
 };
 
-// جلب الألعاب من GameMonetize
+// جلب الألعاب من GameMonetize Game Feed
 async function fetchGameMonetizeGames() {
     try {
-        const response = await fetch(`${GAMEMONETIZE_CONFIG.apiUrl}/games?user_id=${GAMEMONETIZE_CONFIG.publisherId}&format=json`);
+        const gameFeedUrl = 'https://gamemonetize.com/feed.php?format=0&num=50&page=1';
+        const response = await fetch(gameFeedUrl);
         const data = await response.json();
-        return data.games || [];
+        return data || [];
     } catch (error) {
         console.error('Error fetching GameMonetize games:', error);
         return [];

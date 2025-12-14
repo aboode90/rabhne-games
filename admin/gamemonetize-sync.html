@@ -40,6 +40,11 @@
                     <label>Site ID:</label>
                     <input type="text" id="siteId" placeholder="أدخل Site ID">
                 </div>
+                <div class="form-group">
+                    <label>Game Feed URL:</label>
+                    <input type="url" id="gameFeedUrl" value="https://gamemonetize.com/feed.php?format=0&num=50&page=1">
+                    <small>رابط Game Feed الخاص بك - تم تحديثه تلقائياً</small>
+                </div>
                 <button class="btn btn-primary" onclick="saveConfig()">💾 حفظ الإعدادات</button>
             </div>
 
@@ -118,21 +123,24 @@
             const publisherId = document.getElementById('publisherId').value;
             const apiKey = document.getElementById('apiKey').value;
             const siteId = document.getElementById('siteId').value;
+            const gameFeedUrl = document.getElementById('gameFeedUrl').value;
             
-            if (!publisherId || !apiKey || !siteId) {
-                alert('يرجى ملء جميع الحقول');
+            if (!gameFeedUrl) {
+                alert('يرجى إدخال Game Feed URL على الأقل');
                 return;
             }
             
-            // حفظ في localStorage مؤقتاً (في الإنتاج، احفظها في قاعدة البيانات)
+            // حفظ في localStorage
             localStorage.setItem('gm_publisher_id', publisherId);
             localStorage.setItem('gm_api_key', apiKey);
             localStorage.setItem('gm_site_id', siteId);
+            localStorage.setItem('gm_game_feed_url', gameFeedUrl);
             
             // تحديث الإعدادات في الكود
             GAMEMONETIZE_CONFIG.publisherId = publisherId;
             GAMEMONETIZE_CONFIG.apiKey = apiKey;
             GAMEMONETIZE_CONFIG.siteId = siteId;
+            GAMEMONETIZE_CONFIG.gameFeedUrl = gameFeedUrl;
             
             showMessage('تم حفظ الإعدادات بنجاح!', 'success');
         }
@@ -229,10 +237,12 @@
             const publisherId = localStorage.getItem('gm_publisher_id');
             const apiKey = localStorage.getItem('gm_api_key');
             const siteId = localStorage.getItem('gm_site_id');
+            const gameFeedUrl = localStorage.getItem('gm_game_feed_url');
             
             if (publisherId) document.getElementById('publisherId').value = publisherId;
             if (apiKey) document.getElementById('apiKey').value = apiKey;
             if (siteId) document.getElementById('siteId').value = siteId;
+            if (gameFeedUrl) document.getElementById('gameFeedUrl').value = gameFeedUrl;
         });
     </script>
 </body>
