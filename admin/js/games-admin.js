@@ -11,48 +11,36 @@ window.deleteGame = deleteGame;
 
 // Check admin access on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Expose functions immediately to ensure they're available
+    // Expose functions immediately
     window.showAddGame = showAddGame;
     window.closeModal = closeModal;
     window.toggleGame = toggleGame;
     window.editGame = editGame;
     window.deleteGame = deleteGame;
     
-    // Add debug logging
     console.log('Games admin page loaded');
     
-    setTimeout(async () => {
-        try {
-            console.log('Checking admin access...');
-            // Check if requireAdmin is available
-            if (typeof requireAdmin !== 'function') {
-                console.error('requireAdmin function not available');
-                showMessage('خطأ في تحميل النظام الإداري', 'error');
-                return;
+    // Wait for Firebase auth
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                
+                if (userData && userData.isAdmin === true) {
+                    loadGames();
+                    setupForms();
+                } else {
+                    showMessage('ليس لديك صلاحية للوصول لهذه الصفحة', 'error');
+                }
+            } catch (error) {
+                console.error('Error checking admin:', error);
+                showMessage('حدث خطأ في التحقق', 'error');
             }
-            
-            const isAdmin = await requireAdmin();
-            console.log('Admin check result:', isAdmin);
-            
-            if (isAdmin) {
-                console.log('Loading games...');
-                loadGames();
-                setupForms();
-            } else {
-                console.log('User is not admin');
-                showMessage('ليس لديك صلاحية للوصول لهذه الصفحة', 'error');
-            }
-        } catch (error) {
-            console.error('Error initializing admin functions:', error);
-            showMessage('حدث خطأ أثناء تحميل الصفحة الإدارية: ' + error.message, 'error');
-            // Still expose functions even if admin check fails
-            window.showAddGame = showAddGame;
-            window.closeModal = closeModal;
-            window.toggleGame = toggleGame;
-            window.editGame = editGame;
-            window.deleteGame = deleteGame;
+        } else {
+            showMessage('يجب تسجيل الدخول', 'error');
         }
-    }, 1000);
+    });
 });
 
 async function loadGames() {
