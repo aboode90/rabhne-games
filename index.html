@@ -176,22 +176,30 @@
         });
         
         // Setup event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginBtn = document.getElementById('loginButton');
-            const logoutBtn = document.getElementById('logoutButton');
-            const mobileAuthBtn = document.getElementById('mobileAuthButton');
-            
-            if (loginBtn) {
-                loginBtn.addEventListener('click', loginWithGoogle);
-            }
-            
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', logout);
-            }
-            
-            if (mobileAuthBtn) {
-                mobileAuthBtn.addEventListener('click', loginWithGoogle);
-            }
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const loginBtn = document.getElementById('loginButton');
+                const logoutBtn = document.getElementById('logoutButton');
+                const mobileAuthBtn = document.getElementById('mobileAuthButton');
+                
+                if (loginBtn) {
+                    loginBtn.onclick = function() {
+                        console.log('Login button clicked');
+                        loginWithGoogle();
+                    };
+                }
+                
+                if (logoutBtn) {
+                    logoutBtn.onclick = logout;
+                }
+                
+                if (mobileAuthBtn) {
+                    mobileAuthBtn.onclick = function() {
+                        console.log('Mobile login clicked');
+                        loginWithGoogle();
+                    };
+                }
+            }, 1000);
         });
         
         if ('serviceWorker' in navigator) {
