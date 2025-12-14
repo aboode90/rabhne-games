@@ -64,8 +64,10 @@ function displayGames() {
 
     gamesGrid.innerHTML = filteredGames.map(game => `
         <div class="game-card">
-            <img src="${game.thumbnail || 'img/game.jpg'}" alt="${game.title}" class="game-thumbnail" 
-                 onerror="this.src='img/game.jpg'">
+            <img src="${game.thumbnail || 'https://via.placeholder.com/300x200/007bff/ffffff?text=🎮'}" 
+                 alt="${game.title}" 
+                 class="game-thumbnail" 
+                 onerror="this.src='https://via.placeholder.com/300x200/007bff/ffffff?text=🎮'">
             <div class="game-info">
                 <h3 class="game-title">${game.title}</h3>
                 <p class="game-category">${getCategoryName(game.category)}</p>
