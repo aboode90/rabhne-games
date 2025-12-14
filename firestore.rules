@@ -8,7 +8,14 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == userId;
       
       // Admin creation (via auth trigger mostly) or new user signup
-      allow create: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId &&
+        // Validate required fields
+        request.resource.data.keys().hasAll(['email', 'points', 'dailyPoints', 'isAdmin', 'blocked']) &&
+        // Ensure safe defaults
+        request.resource.data.points == 0 &&
+        request.resource.data.dailyPoints == 0 &&
+        request.resource.data.isAdmin == false &&
+        request.resource.data.blocked == false;
       
       // Admins can read and write all
       allow read, write: if request.auth != null && 
@@ -19,35 +26,46 @@ service cloud.firestore {
       allow update: if request.auth != null && request.auth.uid == userId &&
         // 1. Cannot change isAdmin or blocked status
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'blocked']) &&
-        // 2. If points are changed, they must be an increment of max 5 (prevents hacking 1M points)
+        // 2. Cannot change email after creation
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['email']) &&
+        // 3. If points are changed, they must be an increment of max 5 (prevents hacking 1M points)
         (
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points']) || 
           (
-            request.resource.data.points > resource.data.points &&
+            request.resource.data.points >= resource.data.points &&
             request.resource.data.points <= resource.data.points + 5
           )
         ) &&
-        // 3. Daily points logic: Allow increment OR reset (value <= 5)
+        // 4. Daily points logic: Allow increment OR reset (value <= 5)
         (
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['dailyPoints']) ||
           (
             // Normal increment
-            (request.resource.data.dailyPoints > resource.data.dailyPoints && request.resource.data.dailyPoints <= resource.data.dailyPoints + 5) ||
+            (request.resource.data.dailyPoints >= resource.data.dailyPoints && request.resource.data.dailyPoints <= resource.data.dailyPoints + 5) ||
             // Reset for new day (allow setting to small value)
             request.resource.data.dailyPoints <= 5
           )
-        );
+        ) &&
+        // 5. Validate data types
+        request.resource.data.points is number &&
+        request.resource.data.dailyPoints is number;
     }
     
     // Games collection
     match /games/{gameId} {
+      // Anyone can read active games
       allow read: if resource.data.active == true;
+      
+      // Only admins can create/update/delete games
       allow write: if request.auth != null && 
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      
+      // Allow incrementing play count by 1
       allow update: if request.auth != null &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['plays']) &&
-        request.resource.data.plays == resource.data.plays + 1;
+        request.resource.data.plays == resource.data.plays + 1 &&
+        request.resource.data.plays is number;
     }
     
     // Withdraw requests collection
@@ -74,8 +92,18 @@ service cloud.firestore {
       // Users can read their own transactions
       allow read: if request.auth != null && request.auth.uid == resource.data.uid;
       
-      // FIXED: Allow users to create their own transaction logs
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      // Allow users to create their own transaction logs with validation
+      allow create: if request.auth != null && 
+        request.resource.data.uid == request.auth.uid &&
+        // Validate required fields
+        request.resource.data.keys().hasAll(['uid', 'type', 'pointsDelta']) &&
+        // Validate data types
+        request.resource.data.uid is string &&
+        request.resource.data.type is string &&
+        request.resource.data.pointsDelta is number &&
+        // Limit point delta to prevent abuse
+        request.resource.data.pointsDelta >= -10000 &&
+        request.resource.data.pointsDelta <= 5;
       
       // Admins can read all transactions (for dashboard)
       allow read: if request.auth != null && 

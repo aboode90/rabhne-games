@@ -1,32 +1,51 @@
 // Authentication functions
 let currentUser = null;
+let authInitialized = false;
 
 // Check auth state
 auth.onAuthStateChanged(async (user) => {
     currentUser = user;
+    authInitialized = true;
     updateUI();
 
     if (user) {
-        await ensureUserDocument(user);
-        checkAdminAccess();
+        try {
+            await ensureUserDocument(user);
+            await checkAdminAccess();
+        } catch (error) {
+            console.error('Error in auth state change:', error);
+        }
     }
 });
 
 async function ensureUserDocument(user) {
-    const userRef = db.collection('users').doc(user.uid);
-    const userDoc = await userRef.get();
+    if (!user || !user.uid) return;
+    
+    try {
+        const userRef = db.collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
 
-    if (!userDoc.exists) {
-        await userRef.set({
-            displayName: user.displayName || 'مستخدم جديد',
-            email: user.email,
-            points: 0,
-            dailyPoints: 0,
-            lastClaimAt: null,
-            isAdmin: false,
-            blocked: false,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        if (!userDoc.exists) {
+            await userRef.set({
+                displayName: user.displayName || 'مستخدم جديد',
+                email: user.email,
+                photoURL: user.photoURL || null,
+                points: 0,
+                dailyPoints: 0,
+                lastClaimAt: null,
+                isAdmin: false,
+                blocked: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } else {
+            // Update last login
+            await userRef.update({
+                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+    } catch (error) {
+        console.error('Error ensuring user document:', error);
     }
 }
 
@@ -130,46 +149,48 @@ async function checkAdminAccess() {
 // Google Login function
 async function loginWithGoogle() {
     try {
-        // إظهار رسالة تحميل
+        // Check if already in progress
+        if (auth.currentUser) {
+            showMessage('أنت مسجل دخول بالفعل', 'info');
+            return true;
+        }
+
         showMessage('جاري تسجيل الدخول...', 'info');
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('email');
         provider.addScope('profile');
-        
-        // تمكين خيارات إضافية للمزود
         provider.setCustomParameters({
             prompt: 'select_account'
         });
 
-        // محاولة تسجيل الدخول
         const result = await auth.signInWithPopup(provider);
         
         if (result.user) {
-            showMessage(`مرحباً بك ${result.user.displayName || 'مستخدم'}! تم تسجيل الدخول بنجاح`, 'success');
+            showMessage(`مرحباً بك ${result.user.displayName || 'مستخدم'}!`, 'success');
             return true;
         }
     } catch (error) {
         console.error('Login error:', error);
-        
-        // معالجة أنواع مختلفة من الأخطاء
-        if (error.code === 'auth/popup-blocked') {
-            showMessage('تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة وإعادة المحاولة', 'error');
-        } else if (error.code === 'auth/cancelled-popup-request') {
-            // لا تعرض رسالة لهذا الخطأ
-        } else if (error.code === 'auth/popup-closed-by-user') {
-            // لا تعرض رسالة لهذا الخطأ
-        } else if (error.code === 'auth/network-request-failed') {
-            showMessage('خطأ في الاتصال بالإنترنت. تأكد من اتصالك وحاول مرة أخرى', 'error');
-        } else if (error.code === 'auth/too-many-requests') {
-            showMessage('محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى', 'error');
-        } else if (error.code === 'auth/operation-not-allowed') {
-            showMessage('تسجيل الدخول بجوجل غير مفعل. يرجى التواصل مع الإدارة', 'error');
-        } else {
-            showMessage('حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى', 'error');
-        }
-        
+        handleAuthError(error);
         return false;
+    }
+}
+
+// Handle authentication errors
+function handleAuthError(error) {
+    const errorMessages = {
+        'auth/popup-blocked': 'تم حظر النافذة المنبثقة. يرجى السماح بها',
+        'auth/network-request-failed': 'خطأ في الاتصال. تأكد من الإنترنت',
+        'auth/too-many-requests': 'محاولات كثيرة. انتظر قليلاً',
+        'auth/operation-not-allowed': 'تسجيل الدخول غير مفعل'
+    };
+
+    const message = errorMessages[error.code] || 'حدث خطأ في تسجيل الدخول';
+    
+    // Don't show message for user-cancelled actions
+    if (!['auth/cancelled-popup-request', 'auth/popup-closed-by-user'].includes(error.code)) {
+        showMessage(message, 'error');
     }
 }
 

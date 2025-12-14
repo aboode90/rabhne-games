@@ -12,41 +12,69 @@ async function loadGame() {
 
     if (!slug) {
         showMessage('لم يتم تحديد اللعبة', 'error');
+        setTimeout(() => window.location.href = 'games.html', 2000);
         return;
     }
 
     try {
         const gameQuery = await db.collection('games')
             .where('slug', '==', slug)
+            .where('active', '==', true)
             .limit(1)
             .get();
 
         if (gameQuery.empty) {
-            showMessage('اللعبة غير موجودة', 'error');
+            showMessage('اللعبة غير موجودة أو غير نشطة', 'error');
+            setTimeout(() => window.location.href = 'games.html', 2000);
             return;
         }
 
         currentGame = gameQuery.docs[0].data();
         currentGame.id = gameQuery.docs[0].id;
 
-        // Update page title and info
-        document.getElementById('gameTitle').textContent = currentGame.title;
-        document.getElementById('gameCategory').textContent = getCategoryName(currentGame.category);
-
-        // Check if user is logged in
-        if (currentUser) {
-            document.getElementById('authRequired').style.display = 'none';
-            document.getElementById('claimSection').style.display = 'block';
-            
-            // Load user points
-            loadUserPoints();
+        // Validate game data
+        if (!currentGame.iframeUrl || !currentGame.title) {
+            showMessage('بيانات اللعبة غير مكتملة', 'error');
+            return;
         }
 
-        console.log('Game loaded:', currentGame);
+        // Update page title and info
+        document.title = `${currentGame.title} - Rabhne`;
+        const titleEl = document.getElementById('gameTitle');
+        const categoryEl = document.getElementById('gameCategory');
+        
+        if (titleEl) titleEl.textContent = currentGame.title;
+        if (categoryEl) categoryEl.textContent = getCategoryName(currentGame.category);
+
+        // Wait for auth state
+        if (authInitialized) {
+            updateGameUI();
+        } else {
+            firebase.auth().onAuthStateChanged(() => {
+                updateGameUI();
+            });
+        }
+
+        console.log('Game loaded:', currentGame.title);
 
     } catch (error) {
         console.error('Error loading game:', error);
-        showMessage('حدث خطأ أثناء تحميل اللعبة', 'error');
+        showMessage('حدث خطأ أثناء تحميل اللعبة: ' + error.message, 'error');
+    }
+}
+
+// Update game UI based on auth state
+function updateGameUI() {
+    const authRequired = document.getElementById('authRequired');
+    const claimSection = document.getElementById('claimSection');
+    
+    if (currentUser) {
+        if (authRequired) authRequired.style.display = 'none';
+        if (claimSection) claimSection.style.display = 'block';
+        loadUserPoints();
+    } else {
+        if (authRequired) authRequired.style.display = 'block';
+        if (claimSection) claimSection.style.display = 'none';
     }
 }
 
@@ -209,12 +237,24 @@ function startGameTimer() {
 
 // Award point to user
 async function awardPoint() {
-    if (!currentUser) return;
+    if (!currentUser || !currentGame) return;
     
     try {
         const userRef = db.collection('users').doc(currentUser.uid);
         const userDoc = await userRef.get();
+        
+        if (!userDoc.exists) {
+            console.error('User document not found');
+            return;
+        }
+        
         const userData = userDoc.data();
+        
+        // Check if user is blocked
+        if (userData.blocked) {
+            showMessage('حسابك محظور', 'error');
+            return;
+        }
         
         // Check daily limit
         const today = new Date().toDateString();
@@ -226,19 +266,25 @@ async function awardPoint() {
         }
         
         if (dailyPoints >= APP_CONFIG.DAILY_LIMIT) {
-            showMessage('لقد وصلت للحد الأقصى اليومي من النقاط', 'error');
+            showMessage('لقد وصلت للحد الأقصى اليومي من النقاط', 'warning');
             return;
         }
         
+        // Use batch for atomic operations
+        const batch = db.batch();
+        
         // Update user points
-        await userRef.update({
+        batch.update(userRef, {
             points: firebase.firestore.FieldValue.increment(APP_CONFIG.POINTS_PER_CLAIM),
-            dailyPoints: firebase.firestore.FieldValue.increment(APP_CONFIG.POINTS_PER_CLAIM),
+            dailyPoints: lastClaimDate === today ? 
+                firebase.firestore.FieldValue.increment(APP_CONFIG.POINTS_PER_CLAIM) : 
+                APP_CONFIG.POINTS_PER_CLAIM,
             lastClaimAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
         // Add transaction log
-        await db.collection('transactions').add({
+        const transactionRef = db.collection('transactions').doc();
+        batch.set(transactionRef, {
             uid: currentUser.uid,
             type: 'game_play',
             pointsDelta: APP_CONFIG.POINTS_PER_CLAIM,
@@ -247,9 +293,12 @@ async function awardPoint() {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
+        // Commit batch
+        await batch.commit();
+        
         // Update UI
         loadUserPoints();
-        showMessage('تم احتساب نقطة واحدة!', 'success');
+        showMessage(`+${APP_CONFIG.POINTS_PER_CLAIM} نقطة!`, 'success');
         
     } catch (error) {
         console.error('Error awarding point:', error);
