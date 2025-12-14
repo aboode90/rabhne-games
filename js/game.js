@@ -90,13 +90,13 @@ function showAdCashVideoAd() {
     
     document.body.appendChild(adContainer);
     
-    // Load AdCash VAST video ad
+    // Load AdCash VAST video ad with REAL VAST URL
     loadAdCashVASTAd();
 }
 
-// Load AdCash VAST Video Ad
+// Load AdCash VAST Video Ad with REAL URL
 function loadAdCashVASTAd() {
-    // AdCash VAST Tag URL
+    // AdCash REAL VAST Tag URL ( PROVIDED BY YOU )
     const vastTagUrl = 'https://youradexchange.com/video/select.php?r=10711262';
     
     // Create video player

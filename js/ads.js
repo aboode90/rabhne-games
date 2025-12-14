@@ -19,7 +19,7 @@ function showRewardedAd(callback) {
 // Show AdCash VAST video ad
 function showAdCashVASTAd(callback) {
     try {
-        // AdCash VAST Tag URL for rewarded ads
+        // AdCash VAST Tag URL for rewarded ads (YOU NEED TO GET THIS FROM ADCASH)
         const vastTagUrl = 'https://youradexchange.com/video/select.php?r=REWARDED_AD_ZONE_ID'; // Replace with actual rewarded ad zone ID
         
         // Create video player container
