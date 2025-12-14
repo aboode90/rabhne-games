@@ -27,10 +27,44 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
+// Function to add Foxy Eco Sort game
+async function addFoxyEcoSortGame() {
+    const gameData = {
+        title: 'Foxy Eco Sort',
+        slug: 'foxy-eco-sort',
+        iframeUrl: 'https://html5.gamedistribution.com/rvvASWA4/8e3527971f5c4457b0691897f02111bb/index.html',
+        thumbnailUrl: 'https://img.gamedistribution.com/8e3527971f5c4457b0691897f02111bb-512x384.jpeg',
+        category: 'puzzle',
+        isActive: true,
+        plays: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        // Check if game already exists
+        const existingGame = await db.collection('games')
+            .where('slug', '==', gameData.slug)
+            .get();
+
+        if (!existingGame.empty) {
+            console.log('Game already exists');
+            return;
+        }
+
+        // Add new game
+        await db.collection('games').add(gameData);
+        console.log('Foxy Eco Sort game added successfully');
+    } catch (error) {
+        console.error('Error adding game:', error);
+    }
+}
+
 // Load Dashboard Data
 async function loadAdminDashboard() {
     loadPendingWithdrawals();
     loadAdminStats();
+    // Add Foxy Eco Sort game when admin dashboard loads
+    addFoxyEcoSortGame();
 }
 
 // Load Pending Withdrawals
