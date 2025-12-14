@@ -4,8 +4,7 @@
   "description": "منصة ألعاب HTML5 عربية احترافية",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'Build complete'",
-    "start": "echo 'Starting server'"
+    "build": "echo 'Build complete'"
   },
   "keywords": ["games", "html5", "arabic", "points"],
   "author": "Rabhne Team",
