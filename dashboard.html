@@ -46,72 +46,177 @@
 
     <!-- Main Content -->
     <main class="main-content dashboard">
-        <div class="container">
-            <!-- Dashboard Header -->
-            <div class="dashboard-header">
-                <h1>مرحباً، <span id="dashboardUserName">المستخدم</span>! 👋</h1>
-                <p>إدارة حسابك ونقاطك من هنا - النظام المحسن v2.0</p>
+        <!-- Dashboard Hero -->
+        <section class="dashboard-hero">
+            <div class="hero-background">
+                <div class="hero-particles"></div>
+                <div class="hero-gradient"></div>
             </div>
+            <div class="container">
+                <div class="dashboard-hero-content">
+                    <h1 class="hero-title">مرحباً، <span id="dashboardUserName">المستخدم</span>! 👋</h1>
+                    <p class="hero-subtitle">إدارة حسابك ونقاطك بسهولة مع النظام المحسن v2.0</p>
+                </div>
+            </div>
+        </section>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="userPoints">0</div>
-                    <div class="stat-label">إجمالي النقاط</div>
+        <div class="container">
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <h2 class="section-title">📊 إحصائيات حسابك</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-number" id="userPoints">0</div>
+                        <div class="stat-label">إجمالي النقاط</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-number" id="dailyPoints">0</div>
+                        <div class="stat-label">نقاط اليوم</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">💵</div>
+                        <div class="stat-number" id="cashValue">$0.00</div>
+                        <div class="stat-label">القيمة النقدية</div>
+                    </div>
+                    <div class="stat-card info">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-number" id="remainingDaily">2880</div>
+                        <div class="stat-label">المتبقي اليوم</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="dailyPoints">0</div>
-                    <div class="stat-label">نقاط اليوم</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="cashValue">$0.00</div>
-                    <div class="stat-label">القيمة النقدية</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="remainingDaily">2880</div>
-                    <div class="stat-label">المتبقي اليوم</div>
-                </div>
-            </div>
+            </section>
 
             <!-- Ads Banner -->
-            <div class="ads-banner">
-                <div class="ads-content">
-                    <h3>💎 نقاط مجانية!</h3>
-                    <p>شاهد إعلانات قصيرة وزد رصيدك</p>
+            <section class="ads-section">
+                <div class="ads-banner">
+                    <div class="ads-content">
+                        <div class="ads-icon">🎁</div>
+                        <div class="ads-text">
+                            <h3>💎 نقاط مجانية إضافية!</h3>
+                            <p>شاهد إعلانات قصيرة واحصل على نقاط إضافية فوراً</p>
+                        </div>
+                    </div>
+                    <button id="btnWatchAd" class="btn btn-large btn-primary pulse-animation" onclick="showRewardedAd()">
+                        🎬 شاهد واربح (+10)
+                    </button>
                 </div>
-                <button id="btnWatchAd" class="btn btn-primary" onclick="showRewardedAd()">
-                    🎬 شاهد (+10)
-                </button>
-            </div>
+            </section>
 
-            <!-- Dashboard Actions -->
-            <div class="dashboard-actions">
-                <a href="earn.html" class="btn btn-large btn-primary earn-btn">💎 المهام</a>
-                <a href="games.html" class="btn btn-large btn-primary">🎮 الألعاب</a>
-                <a href="withdraw.html" class="btn btn-large btn-secondary">💰 سحب</a>
-                <a href="profile.html" class="btn btn-large btn-secondary">👤 الملف</a>
-                <a href="support.html" class="btn btn-large btn-warning">🎧 الدعم</a>
-            </div>
+            <!-- Quick Actions -->
+            <section class="actions-section">
+                <h2 class="section-title">⚡ إجراءات سريعة</h2>
+                <div class="dashboard-actions">
+                    <a href="earn.html" class="action-card earn-card">
+                        <div class="action-icon">💎</div>
+                        <h3>المهام اليومية</h3>
+                        <p>أنجز مهام بسيطة واربح نقاط</p>
+                    </a>
+                    <a href="games.html" class="action-card games-card">
+                        <div class="action-icon">🎮</div>
+                        <h3>الألعاب</h3>
+                        <p>العب واستمتع واربح نقاط</p>
+                    </a>
+                    <a href="withdraw.html" class="action-card withdraw-card">
+                        <div class="action-icon">💰</div>
+                        <h3>سحب الأرباح</h3>
+                        <p>حول نقاطك إلى أموال</p>
+                    </a>
+                    <a href="profile.html" class="action-card profile-card">
+                        <div class="action-icon">👤</div>
+                        <h3>الملف الشخصي</h3>
+                        <p>إدارة بياناتك</p>
+                    </a>
+                    <a href="support.html" class="action-card support-card">
+                        <div class="action-icon">🎧</div>
+                        <h3>الدعم الفني</h3>
+                        <p>مساعدة ودعم 24/7</p>
+                    </a>
+                </div>
+            </section>
 
-            <!-- Recent Transactions -->
-            <div class="admin-card">
-                <h2>العمليات الأخيرة 📊</h2>
-                <div id="recentTransactions">
-                    <div class="loading-spinner"></div>
-                    <p>جاري التحميل...</p>
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h2>📊 العمليات الأخيرة</h2>
+                        <div id="recentTransactions">
+                            <div class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <p>جاري تحميل العمليات...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="activity-card">
+                        <h2>💰 طلبات السحب</h2>
+                        <div id="withdrawHistory">
+                            <div class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <p>جاري تحميل طلبات السحب...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🎮</span>
+                        <span class="logo-text">Rabhne v2.0</span>
+                    </div>
+                    <p class="footer-description">لوحة تحكم شاملة لإدارة حسابك ونقاطك</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">🏠 الرئيسية</a></li>
+                        <li><a href="games.html">🎮 الألعاب</a></li>
+                        <li><a href="earn.html">💎 المهام</a></li>
+                        <li><a href="withdraw.html">💰 السحب</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>الدعم</h4>
+                    <ul class="footer-links">
+                        <li><a href="support.html">📞 الدعم الفني</a></li>
+                        <li><a href="mailto:support@rabhne.online">✉️ البريد الإلكتروني</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>إحصائياتك</h4>
+                    <div class="footer-stats">
+                        <div class="footer-stat">
+                            <span class="stat-value" id="footerPoints">0</span>
+                            <span class="stat-label">نقطة</span>
+                        </div>
+                        <div class="footer-stat">
+                            <span class="stat-value" id="footerCash">$0</span>
+                            <span class="stat-label">قيمة نقدية</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Withdraw History -->
-            <div class="admin-card">
-                <h2>طلبات السحب 💰</h2>
-                <div id="withdrawHistory">
-                    <div class="loading-spinner"></div>
-                    <p>جاري التحميل...</p>
+            
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <p>&copy; 2024 Rabhne Games. جميع الحقوق محفوظة.</p>
+                    <p class="footer-version">النظام المحسن v2.0 - تم التطوير ب❤️ في المملكة العربية السعودية</p>
                 </div>
             </div>
         </div>
-    </main>
+    </footer>
 
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-bottom-nav">

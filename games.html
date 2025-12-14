@@ -21,7 +21,7 @@
     <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
 </head>
 
-<body data-theme="light">
+<body data-theme="light" data-online="true">
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -52,51 +52,146 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="container">
-            <!-- Header -->
-            <div class="dashboard-header">
-                <h1>🎮 مجموعة الألعاب المتقدمة</h1>
-                <p>🎆 اختر لعبتك المفضلة وابدأ في كسب النقاط فوراً! 💰 - النظام المحسن v2.0</p>
+        <!-- Hero Section -->
+        <section class="games-hero">
+            <div class="hero-background">
+                <div class="hero-particles"></div>
+                <div class="hero-gradient"></div>
             </div>
-
-            <!-- Games Filter -->
-            <div class="games-filter">
-                <div class="filter-container">
-                    <select id="categoryFilter" class="filter-select" onchange="filterGames()">
-                        <option value="">جميع الفئات 🎯</option>
-                        <option value="action">أكشن ⚔️</option>
-                        <option value="puzzle">ألغاز 🧩</option>
-                        <option value="racing">سباق 🏎️</option>
-                        <option value="sports">رياضة ⚽</option>
-                        <option value="adventure">مغامرة 🗺️</option>
-                    </select>
-                    
-                    <div class="search-container">
-                        <input type="text" id="searchInput" placeholder="ابحث عن لعبة..." onkeyup="searchGames()">
-                        <span class="search-icon">🔍</span>
+            <div class="container">
+                <div class="games-hero-content">
+                    <h1 class="hero-title">🎮 مجموعة الألعاب المتقدمة</h1>
+                    <p class="hero-subtitle">اختر من مجموعة متنوعة من الألعاب المثيرة واربح نقاط حقيقية مع كل لعبة!</p>
+                    <div class="games-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalGamesCount">15+</span>
+                            <span class="stat-label">لعبة متاحة</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <span class="stat-number">1</span>
+                            <span class="stat-label">نقطة/دقيقة</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
+
+        <div class="container">
+            <!-- Games Filter -->
+            <section class="games-filter-section">
+                <h2 class="section-title">🎯 اختر فئة اللعبة</h2>
+                <div class="filter-container">
+                    <div class="category-filters">
+                        <button class="category-btn active" data-category="" onclick="filterByCategory('')">
+                            <span class="category-icon">🎯</span>
+                            <span>جميع الألعاب</span>
+                        </button>
+                        <button class="category-btn" data-category="action" onclick="filterByCategory('action')">
+                            <span class="category-icon">⚔️</span>
+                            <span>أكشن</span>
+                        </button>
+                        <button class="category-btn" data-category="puzzle" onclick="filterByCategory('puzzle')">
+                            <span class="category-icon">🧩</span>
+                            <span>ألغاز</span>
+                        </button>
+                        <button class="category-btn" data-category="racing" onclick="filterByCategory('racing')">
+                            <span class="category-icon">🏎️</span>
+                            <span>سباق</span>
+                        </button>
+                        <button class="category-btn" data-category="sports" onclick="filterByCategory('sports')">
+                            <span class="category-icon">⚽</span>
+                            <span>رياضة</span>
+                        </button>
+                        <button class="category-btn" data-category="adventure" onclick="filterByCategory('adventure')">
+                            <span class="category-icon">🗺️</span>
+                            <span>مغامرة</span>
+                        </button>
+                    </div>
+                    
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="🔍 ابحث عن لعبة..." onkeyup="searchGames()">
+                    </div>
+                </div>
+            </section>
 
             <!-- Games Grid -->
-            <div id="gamesGrid" class="games-grid">
-                <!-- Games will be loaded here -->
-            </div>
+            <section class="games-section">
+                <h2 class="section-title">🎮 الألعاب المتاحة</h2>
+                <div id="gamesGrid" class="games-grid">
+                    <!-- Games will be loaded here -->
+                </div>
 
-            <!-- Loading -->
-            <div id="loadingGames" class="loading-container">
-                <div class="loading-spinner"></div>
-                <p>جاري تحميل الألعاب...</p>
-            </div>
+                <!-- Loading -->
+                <div id="loadingGames" class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>جاري تحميل الألعاب الرائعة...</p>
+                </div>
 
-            <!-- No Games Found -->
-            <div id="noGamesFound" class="no-games" style="display: none;">
-                <div class="no-games-icon">🎮</div>
-                <h3>لا توجد ألعاب</h3>
-                <p>لم يتم العثور على ألعاب تطابق البحث</p>
-            </div>
+                <!-- No Games Found -->
+                <div id="noGamesFound" class="no-games" style="display: none;">
+                    <div class="no-games-icon">🎮</div>
+                    <h3>لا توجد ألعاب</h3>
+                    <p>لم يتم العثور على ألعاب تطابق البحث. جرب كلمات أخرى!</p>
+                    <button class="btn btn-primary" onclick="clearSearch()">مسح البحث</button>
+                </div>
+            </section>
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🎮</span>
+                        <span class="logo-text">Rabhne v2.0</span>
+                    </div>
+                    <p class="footer-description">منصة الألعاب العربية الرائدة لربح الأموال الحقيقية</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">🏠 الرئيسية</a></li>
+                        <li><a href="earn.html">💎 المهام</a></li>
+                        <li><a href="dashboard.html">📊 لوحة التحكم</a></li>
+                        <li><a href="withdraw.html">💰 السحب</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>الدعم</h4>
+                    <ul class="footer-links">
+                        <li><a href="support.html">📞 الدعم الفني</a></li>
+                        <li><a href="mailto:support@rabhne.online">✉️ البريد الإلكتروني</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>إحصائيات الألعاب</h4>
+                    <div class="footer-stats">
+                        <div class="footer-stat">
+                            <span class="stat-value">15+</span>
+                            <span class="stat-label">لعبة متاحة</span>
+                        </div>
+                        <div class="footer-stat">
+                            <span class="stat-value">500+</span>
+                            <span class="stat-label">لاعب نشط</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <p>&copy; 2024 Rabhne Games. جميع الحقوق محفوظة.</p>
+                    <p class="footer-version">النظام المحسن v2.0 - تم التطوير ب❤️ في المملكة العربية السعودية</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-bottom-nav">
