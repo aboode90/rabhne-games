@@ -3,128 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة الألعاب - لوحة الإدارة</title>
+    <title>إدارة الألعاب المتقدمة - Rabhne</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
-            position: relative;
-        }
-        .close {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .form-group small {
-            color: #666;
-            font-size: 12px;
-        }
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #667eea; }
+        .games-section { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .games-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .games-table th, .games-table td { padding: 15px; text-align: right; border-bottom: 1px solid #eee; }
+        .games-table th { background: #f8f9fa; font-weight: bold; }
+        .games-table tr:hover { background: #f8f9fa; }
+        .game-thumbnail { width: 80px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .status-active { background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
+        .status-inactive { background: #f8d7da; color: #721c24; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
+        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative; }
+        .close { position: absolute; right: 20px; top: 20px; font-size: 28px; cursor: pointer; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #667eea; outline: none; }
+        .search-filter { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-filter input, .search-filter select { flex: 1; min-width: 200px; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .empty-state { text-align: center; padding: 60px; color: #999; }
+        .bulk-actions { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .checkbox { margin-left: 10px; }
     </style>
 </head>
 <body>
-    <nav class="navbar admin-nav">
-        <div class="nav-container">
-            <div class="nav-logo">🎮 إدارة الألعاب</div>
-            <div class="nav-menu">
-                <a href="../index.html" class="nav-link">الموقع الرئيسي</a>
-                <a href="index.html" class="nav-link">الإحصائيات</a>
-                <a href="users.html" class="nav-link">المستخدمين</a>
-                <a href="withdrawals.html" class="nav-link">طلبات السحب</a>
-                <a href="games.html" class="nav-link">إدارة الألعاب</a>
-                <button class="btn btn-secondary" onclick="logout()">خروج</button>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1>🎮 إدارة الألعاب المتقدمة</h1>
+            <p>لوحة تحكم شاملة لإدارة جميع الألعاب في الموقع</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalGames">0</div>
+                <div>إجمالي الألعاب</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeGames">0</div>
+                <div>الألعاب النشطة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalPlays">0</div>
+                <div>إجمالي مرات اللعب</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="categoriesCount">0</div>
+                <div>عدد الفئات</div>
             </div>
         </div>
-    </nav>
 
-    <main class="main-content admin-content">
-        <div class="container">
-            <div class="admin-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>قائمة الألعاب</h2>
-                    <button class="btn btn-primary" onclick="showAddGame()">إضافة لعبة جديدة</button>
-                </div>
-                
-                <div id="gamesContainer">
-                    <table class="users-table">
-                        <thead>
-                            <tr>
-                                <th>الصورة</th>
-                                <th>الاسم</th>
-                                <th>الفئة</th>
-                                <th>مرات اللعب</th>
-                                <th>الحالة</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gamesTableBody">
-                            <tr>
-                                <td colspan="6" style="text-align:center">جاري التحميل...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <!-- Games Management Section -->
+        <div class="games-section">
+            <div class="section-header">
+                <h2>📋 إدارة الألعاب</h2>
+                <div>
+                    <button class="btn btn-success" onclick="showAddGameModal()">➕ إضافة لعبة جديدة</button>
+                    <button class="btn btn-warning" onclick="removeDuplicates()">🗑️ حذف المكررات</button>
+                    <button class="btn btn-secondary" onclick="exportGames()">📤 تصدير البيانات</button>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Add Game Modal -->
-    <div id="addGameModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <span class="close" onclick="closeModal('addGameModal')">&times;</span>
-            <h2>إضافة لعبة جديدة</h2>
-            <form id="addGameForm">
+            <!-- Search and Filter -->
+            <div class="search-filter">
+                <input type="text" id="searchGames" placeholder="🔍 البحث في الألعاب..." onkeyup="filterGames()">
+                <select id="filterCategory" onchange="filterGames()">
+                    <option value="">جميع الفئات</option>
+                    <option value="action">أكشن</option>
+                    <option value="puzzle">ألغاز</option>
+                    <option value="racing">سباق</option>
+                    <option value="sports">رياضة</option>
+                    <option value="adventure">مغامرة</option>
+                </select>
+                <select id="filterStatus" onchange="filterGames()">
+                    <option value="">جميع الحالات</option>
+                    <option value="active">نشطة</option>
+                    <option value="inactive">غير نشطة</option>
+                </select>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions" style="display: none;" id="bulkActions">
+                <button class="btn btn-success" onclick="bulkActivate()">تفعيل المحدد</button>
+                <button class="btn btn-warning" onclick="bulkDeactivate()">تعطيل المحدد</button>
+                <button class="btn btn-danger" onclick="bulkDelete()">حذف المحدد</button>
+                <span id="selectedCount">0 محدد</span>
+            </div>
+
+            <!-- Games Table -->
+            <div id="gamesTableContainer">
+                <div class="loading">جاري تحميل الألعاب...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Game Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">إضافة لعبة جديدة</h2>
+            <form id="gameForm">
                 <div class="form-group">
-                    <label for="gameTitle">عنوان اللعبة:</label>
+                    <label for="gameTitle">عنوان اللعبة *</label>
                     <input type="text" id="gameTitle" required>
                 </div>
                 <div class="form-group">
-                    <label for="gameSlug">Slug (معرف فريد):</label>
-                    <input type="text" id="gameSlug" placeholder="game-name" required>
-                    <small>بالإنجليزية فقط، بدون مسافات</small>
+                    <label for="gameSlug">معرف اللعبة (Slug) *</label>
+                    <input type="text" id="gameSlug" required>
+                    <small>سيتم إنشاؤه تلقائياً من العنوان</small>
                 </div>
                 <div class="form-group">
-                    <label for="gameIframe">رابط iframe:</label>
-                    <input type="url" id="gameIframe" placeholder="https://..." required>
+                    <label for="gameDescription">وصف اللعبة</label>
+                    <textarea id="gameDescription" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="gameThumbnail">رابط الصورة المصغرة:</label>
-                    <input type="url" id="gameThumbnail" placeholder="https://..." required>
+                    <label for="gameIframe">رابط اللعبة (iframe) *</label>
+                    <input type="url" id="gameIframe" required>
                 </div>
                 <div class="form-group">
-                    <label for="gameCategory">الفئة:</label>
+                    <label for="gameThumbnail">رابط الصورة المصغرة *</label>
+                    <input type="url" id="gameThumbnail" required>
+                </div>
+                <div class="form-group">
+                    <label for="gameCategory">الفئة *</label>
                     <select id="gameCategory" required>
                         <option value="">اختر الفئة</option>
                         <option value="action">أكشن</option>
@@ -139,104 +158,20 @@
                         <input type="checkbox" id="gameActive" checked> اللعبة نشطة
                     </label>
                 </div>
-                <button type="submit" class="btn btn-primary">إضافة اللعبة</button>
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">💾 حفظ اللعبة</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">❌ إلغاء</button>
+                </div>
             </form>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="js/games-admin.js"></script>
-    
-    <!-- Utility functions -->
-    <script>
-        // Show message helper function
-        function showMessage(message, type = 'info') {
-            // Create message element if it doesn't exist
-            let messageEl = document.getElementById('admin-message');
-            if (!messageEl) {
-                messageEl = document.createElement('div');
-                messageEl.id = 'admin-message';
-                messageEl.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 15px 20px;
-                    border-radius: 5px;
-                    color: white;
-                    font-weight: bold;
-                    z-index: 10000;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-                    max-width: 300px;
-                `;
-                document.body.appendChild(messageEl);
-            }
-            
-            // Set message content and style
-            messageEl.textContent = message;
-            
-            // Set color based on type
-            switch(type) {
-                case 'success':
-                    messageEl.style.backgroundColor = '#4CAF50';
-                    break;
-                case 'error':
-                    messageEl.style.backgroundColor = '#f44336';
-                    break;
-                case 'warning':
-                    messageEl.style.backgroundColor = '#ff9800';
-                    break;
-                default:
-                    messageEl.style.backgroundColor = '#2196F3';
-            }
-            
-            // Show message
-            messageEl.style.display = 'block';
-            
-            // Hide after 3 seconds
-            setTimeout(() => {
-                messageEl.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Show add game modal
-        function showAddGame() {
-            console.log('showAddGame called');
-            const modal = document.getElementById('addGameModal');
-            if (modal) {
-                modal.style.display = 'block';
-                console.log('Modal shown');
-            } else {
-                console.error('Modal not found');
-            }
-        }
-        
-        // Close modal
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-        
-        // Logout function
-        function logout() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                firebase.auth().signOut().then(() => {
-                    window.location.href = '../index.html';
-                }).catch((error) => {
-                    console.error('Error signing out:', error);
-                    showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
-                });
-            }
-        }
-        
-        // Make functions global
-        window.showAddGame = showAddGame;
-        window.closeModal = closeModal;
-    </script>
 </body>
 </html>
