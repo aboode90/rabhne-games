@@ -10,7 +10,7 @@ const GAMEMONETIZE_CONFIG = {
 // جلب الألعاب من GameMonetize Game Feed
 async function fetchGameMonetizeGames() {
     try {
-        const gameFeedUrl = localStorage.getItem('gm_game_feed_url') || 'https://gamemonetize.com/feed.php?format=0&num=50&page=1';
+        const gameFeedUrl = localStorage.getItem('gm_game_feed_url') || 'https://gamemonetize.com/feed.php?format=0&category=13&platform=1&num=20&page=1';
         const response = await fetch(gameFeedUrl, {
             mode: 'cors',
             headers: {
