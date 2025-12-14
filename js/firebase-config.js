@@ -45,28 +45,12 @@ if (APP_CONFIG.POINTS_PER_CLAIM > APP_CONFIG.MAX_POINTS_PER_UPDATE) {
     console.error('Invalid config: POINTS_PER_CLAIM exceeds MAX_POINTS_PER_UPDATE');
 }
 
-// Utility functions with security enhancements
+// Simple message function
 function showMessage(message, type = 'info') {
-    // Input validation and sanitization
-    if (!message || typeof message !== 'string') return;
+    if (!message) return;
     
-    const sanitizedMessage = String(message)
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .substring(0, 200); // Limit length
-    
-    if (!sanitizedMessage.trim()) return;
-    
-    // Remove existing alerts (max 3)
-    const existingAlerts = document.querySelectorAll('.toast-notification');
-    if (existingAlerts.length >= 3) {
-        existingAlerts[0].remove();
-    }
-
     const alertDiv = document.createElement('div');
-    alertDiv.className = `toast-notification toast-${type}`;
-    alertDiv.textContent = sanitizedMessage;
-    
-    // Security: Add CSP-safe styles
+    alertDiv.textContent = message;
     alertDiv.style.cssText = `
         position: fixed;
         top: 20px;
@@ -77,12 +61,8 @@ function showMessage(message, type = 'info') {
         font-weight: bold;
         z-index: 10000;
         max-width: 300px;
-        word-wrap: break-word;
-        opacity: 0;
-        transition: opacity 0.3s ease;
     `;
     
-    // Set background color based on type
     const colors = {
         success: '#4CAF50',
         error: '#f44336',
@@ -93,19 +73,10 @@ function showMessage(message, type = 'info') {
 
     document.body.appendChild(alertDiv);
 
-    // Show with animation
-    requestAnimationFrame(() => {
-        alertDiv.style.opacity = '1';
-    });
-
-    // Auto-remove after 4 seconds
     setTimeout(() => {
-        alertDiv.style.opacity = '0';
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 300);
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
     }, 4000);
 }
 

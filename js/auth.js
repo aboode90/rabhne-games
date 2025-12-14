@@ -175,13 +175,13 @@ async function loginWithGoogle() {
         const result = await auth.signInWithPopup(provider);
         
         if (result.user) {
-            showMessage(`مرحباً بك ${result.user.displayName || 'مستخدم'}!`, 'success');
+            showMessage('تم تسجيل الدخول بنجاح!', 'success');
             return true;
         }
 
     } catch (error) {
         console.error('Login error:', error);
-        handleAuthError(error);
+        showMessage('حدث خطأ في تسجيل الدخول', 'error');
         return false;
     }
 }
