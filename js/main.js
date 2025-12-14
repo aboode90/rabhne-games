@@ -34,14 +34,66 @@ function updateStatsDisplay(stats) {
         totalGames: document.getElementById('totalGames'),
         totalPayouts: document.getElementById('totalPayouts'),
         statPlayers: document.getElementById('statPlayers'),
-        statPaid: document.getElementById('statPaid')
+        statPaid: document.getElementById('statPaid'),
+        statGames: document.getElementById('statGames')
     };
 
     if (elements.totalUsers) elements.totalUsers.textContent = stats.totalUsers;
     if (elements.totalGames) elements.totalGames.textContent = stats.totalGames;
     if (elements.totalPayouts) elements.totalPayouts.textContent = stats.totalPayouts;
-    if (elements.statPlayers) elements.statPlayers.textContent = `+${stats.totalUsers}`;
-    if (elements.statPaid) elements.statPaid.textContent = `$${stats.totalPayouts * 10}`;
+    if (elements.statPlayers) elements.statPlayers.textContent = `+${stats.totalUsers || 500}`;
+    if (elements.statPaid) elements.statPaid.textContent = `$${(stats.totalPayouts || 125) * 10}`;
+    if (elements.statGames) elements.statGames.textContent = `${stats.totalGames || 15}+`;
+}
+
+// تأثيرات التمرير للأقسام
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animated');
+            }
+        });
+    }, observerOptions);
+
+    // مراقبة العناصر القابلة للتحريك
+    const animatedElements = document.querySelectorAll('.feature-card, .step-card, .benefit-card, .section-title');
+    animatedElements.forEach(el => {
+        el.classList.add('animate-on-scroll');
+        observer.observe(el);
+    });
+}
+
+// تحسين تجربة المستخدم
+function enhanceUserExperience() {
+    // إضافة تأثيرات hover للبطاقات
+    const cards = document.querySelectorAll('.feature-card, .step-card, .benefit-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // تحسين الأزرار
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // تأثير الضغط
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 150);
+        });
+    });
 }
 
 // نظام النقاط المحسن
@@ -326,6 +378,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (path === '/' || path === '/index.html') {
         loadStats();
+        // تهيئة التأثيرات للصفحة الرئيسية
+        setTimeout(() => {
+            initScrollAnimations();
+            enhanceUserExperience();
+        }, 500);
     } else if (path === '/dashboard.html') {
         setTimeout(() => {
             if (requireAuth()) {
