@@ -227,13 +227,13 @@
             <div class="section-header">
                 <h2 class="section-title"><i class="fas fa-cogs"></i> إدارة الألعاب</h2>
                 <div class="action-bar">
-                    <button class="btn btn-success" id="addGameBtn">
+                    <button class="btn btn-success" onclick="showAddGameModal()">
                         <i class="fas fa-plus"></i> إضافة لعبة جديدة
                     </button>
-                    <button class="btn btn-warning" id="removeDuplicatesBtn">
+                    <button class="btn btn-warning" onclick="removeDuplicatesGames()">
                         <i class="fas fa-trash-alt"></i> حذف المكررات
                     </button>
-                    <button class="btn btn-info" id="exportBtn">
+                    <button class="btn btn-info" onclick="exportGamesData()">
                         <i class="fas fa-download"></i> تصدير البيانات
                     </button>
                 </div>
@@ -242,8 +242,8 @@
             <!-- Controls -->
             <div class="controls-section">
                 <div class="search-filters">
-                    <input type="text" id="searchInput" placeholder="🔍 البحث في الألعاب..." class="form-control">
-                    <select id="categoryFilter" class="form-control">
+                    <input type="text" id="searchInput" placeholder="🔍 البحث في الألعاب..." class="form-control" onkeyup="filterGamesData()">
+                    <select id="categoryFilter" class="form-control" onchange="filterGamesData()">
                         <option value="">جميع الفئات</option>
                         <option value="action">أكشن</option>
                         <option value="puzzle">ألغاز</option>
@@ -251,7 +251,7 @@
                         <option value="sports">رياضة</option>
                         <option value="adventure">مغامرة</option>
                     </select>
-                    <select id="statusFilter" class="form-control">
+                    <select id="statusFilter" class="form-control" onchange="filterGamesData()">
                         <option value="">جميع الحالات</option>
                         <option value="active">نشطة</option>
                         <option value="inactive">غير نشطة</option>
@@ -263,13 +263,13 @@
             <div class="bulk-actions" id="bulkActions">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <button class="btn btn-success btn-sm" id="bulkActivateBtn">
+                        <button class="btn btn-success btn-sm" onclick="bulkActivateGames()">
                             <i class="fas fa-check"></i> تفعيل المحدد
                         </button>
-                        <button class="btn btn-warning btn-sm" id="bulkDeactivateBtn">
+                        <button class="btn btn-warning btn-sm" onclick="bulkDeactivateGames()">
                             <i class="fas fa-pause"></i> تعطيل المحدد
                         </button>
-                        <button class="btn btn-danger btn-sm" id="bulkDeleteBtn">
+                        <button class="btn btn-danger btn-sm" onclick="bulkDeleteGames()">
                             <i class="fas fa-trash"></i> حذف المحدد
                         </button>
                     </div>
@@ -294,7 +294,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">إضافة لعبة جديدة</h3>
-                <button class="close" id="closeModalBtn">&times;</button>
+                <button class="close" onclick="closeGameModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="gameForm">
@@ -339,10 +339,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelBtn">
+                <button type="button" class="btn btn-secondary" onclick="closeGameModal()">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="submit" form="gameForm" class="btn btn-primary" id="saveBtn">
+                <button type="button" class="btn btn-primary" onclick="saveGameData()">
                     <i class="fas fa-save"></i> حفظ اللعبة
                 </button>
             </div>
@@ -356,5 +356,163 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="js/games-admin.js"></script>
+    
+    <script>
+        // Simple functions that work immediately
+        function showAddGameModal() {
+            console.log('Show add game modal clicked');
+            document.getElementById('gameModal').style.display = 'block';
+        }
+        
+        function closeGameModal() {
+            console.log('Close modal clicked');
+            document.getElementById('gameModal').style.display = 'none';
+        }
+        
+        async function removeDuplicatesGames() {
+            console.log('Remove duplicates clicked');
+            if (!confirm('هل أنت متأكد من حذف الألعاب المكررة؟')) return;
+            
+            try {
+                const games = await db.collection('games').get();
+                const gamesByTitle = {};
+                const toDelete = [];
+                
+                games.forEach(doc => {
+                    const game = doc.data();
+                    if (gamesByTitle[game.title]) {
+                        toDelete.push(doc.id);
+                    } else {
+                        gamesByTitle[game.title] = doc.id;
+                    }
+                });
+                
+                for (const id of toDelete) {
+                    await db.collection('games').doc(id).delete();
+                }
+                
+                alert(`تم حذف ${toDelete.length} لعبة مكررة`);
+                location.reload();
+                
+            } catch (error) {
+                alert('خطأ في حذف المكررات: ' + error.message);
+            }
+        }
+        
+        async function exportGamesData() {
+            console.log('Export games clicked');
+            try {
+                const games = await db.collection('games').get();
+                const gamesData = [];
+                
+                games.forEach(doc => {
+                    gamesData.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                const dataStr = JSON.stringify(gamesData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `games-export-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                alert('تم تصدير البيانات بنجاح');
+                
+            } catch (error) {
+                alert('خطأ في تصدير البيانات: ' + error.message);
+            }
+        }
+        
+        function filterGamesData() {
+            console.log('Filter games called');
+            if (window.gamesManager && typeof gamesManager.filterGames === 'function') {
+                gamesManager.filterGames();
+            }
+        }
+        
+        function bulkActivateGames() {
+            console.log('Bulk activate clicked');
+            if (window.gamesManager && typeof gamesManager.bulkActivate === 'function') {
+                gamesManager.bulkActivate();
+            }
+        }
+        
+        function bulkDeactivateGames() {
+            console.log('Bulk deactivate clicked');
+            if (window.gamesManager && typeof gamesManager.bulkDeactivate === 'function') {
+                gamesManager.bulkDeactivate();
+            }
+        }
+        
+        function bulkDeleteGames() {
+            console.log('Bulk delete clicked');
+            if (window.gamesManager && typeof gamesManager.bulkDelete === 'function') {
+                gamesManager.bulkDelete();
+            }
+        }
+        
+        async function saveGameData() {
+            console.log('Save game clicked');
+            
+            const gameData = {
+                title: document.getElementById('gameTitle').value.trim(),
+                slug: document.getElementById('gameSlug').value.trim(),
+                description: document.getElementById('gameDescription').value.trim(),
+                iframeUrl: document.getElementById('gameIframe').value.trim(),
+                thumbnail: document.getElementById('gameThumbnail').value.trim(),
+                category: document.getElementById('gameCategory').value,
+                active: document.getElementById('gameActive').checked,
+                plays: 0
+            };
+            
+            if (!gameData.title || !gameData.slug || !gameData.iframeUrl || !gameData.category) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+            
+            try {
+                const existingGame = await db.collection('games').where('slug', '==', gameData.slug).get();
+                if (!existingGame.empty) {
+                    alert('معرف اللعبة مستخدم بالفعل');
+                    return;
+                }
+                
+                await db.collection('games').add({
+                    ...gameData,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('تم إضافة اللعبة بنجاح');
+                closeGameModal();
+                location.reload();
+                
+            } catch (error) {
+                alert('خطأ في حفظ اللعبة: ' + error.message);
+            }
+        }
+        
+        // Auto-generate slug from title
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleInput = document.getElementById('gameTitle');
+            const slugInput = document.getElementById('gameSlug');
+            
+            if (titleInput && slugInput) {
+                titleInput.addEventListener('input', function(e) {
+                    const slug = e.target.value
+                        .toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-')
+                        .trim();
+                    slugInput.value = slug;
+                });
+            }
+        });
+    </script>
 </body>
 </html>
