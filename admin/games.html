@@ -173,5 +173,72 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="js/games-admin.js"></script>
+    
+    <script>
+        // Ensure functions are globally available
+        window.showAddGameModal = function() {
+            if (typeof showAddGameModal === 'function') {
+                showAddGameModal();
+            } else {
+                console.error('showAddGameModal not loaded');
+            }
+        };
+        
+        window.removeDuplicates = function() {
+            if (typeof removeDuplicates === 'function') {
+                removeDuplicates();
+            } else {
+                console.error('removeDuplicates not loaded');
+            }
+        };
+        
+        window.exportGames = function() {
+            if (typeof exportGames === 'function') {
+                exportGames();
+            } else {
+                console.error('exportGames not loaded');
+            }
+        };
+        
+        window.filterGames = function() {
+            if (typeof filterGames === 'function') {
+                filterGames();
+            } else {
+                console.error('filterGames not loaded');
+            }
+        };
+        
+        window.closeModal = function() {
+            if (typeof closeModal === 'function') {
+                closeModal();
+            } else {
+                document.getElementById('gameModal').style.display = 'none';
+            }
+        };
+        
+        window.bulkActivate = function() {
+            if (typeof bulkActivate === 'function') {
+                bulkActivate();
+            } else {
+                console.error('bulkActivate not loaded');
+            }
+        };
+        
+        window.bulkDeactivate = function() {
+            if (typeof bulkDeactivate === 'function') {
+                bulkDeactivate();
+            } else {
+                console.error('bulkDeactivate not loaded');
+            }
+        };
+        
+        window.bulkDelete = function() {
+            if (typeof bulkDelete === 'function') {
+                bulkDelete();
+            } else {
+                console.error('bulkDelete not loaded');
+            }
+        };
+    </script>
 </body>
 </html>
