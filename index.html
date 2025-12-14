@@ -49,14 +49,14 @@
                 <a href="admin/index.html" class="nav-link">لوحة الإدارة</a>
                 
                 <div id="authButtons">
-                    <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول</button>
+                    <button class="btn btn-primary" id="loginButton">🔑 تسجيل الدخول</button>
                 </div>
                 
                 <div id="userMenu" style="display: none;">
                     <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
                     <span id="userName"></span>
                     <a href="dashboard.html" class="btn btn-primary">لوحة التحكم</a>
-                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                    <button class="btn btn-secondary" id="logoutButton">خروج</button>
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@
             <span class="mobile-nav-icon">📋</span>
             <span class="mobile-nav-text">لوحتي</span>
         </a>
-        <div class="mobile-nav-item" id="mobileAuthButton" onclick="loginWithGoogle()">
+        <div class="mobile-nav-item" id="mobileAuthButton">
             <span class="mobile-nav-icon">🔑</span>
             <span class="mobile-nav-text">دخول</span>
         </div>
@@ -158,13 +158,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
-    <script src="/config/app-config.js"></script>
-    <script src="/core/security/security-manager.js"></script>
-    <script src="/core/utils/ui-manager.js"></script>
-    <script src="/core/auth/auth-manager.js"></script>
-    <script src="/core/api/points-manager.js"></script>
-    <script src="/core/app-core.js"></script>
     
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
@@ -179,6 +172,25 @@
                     loadingScreen.style.opacity = '0';
                     setTimeout(() => loadingScreen.remove(), 300);
                 }, 1000);
+            }
+        });
+        
+        // Setup event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('loginButton');
+            const logoutBtn = document.getElementById('logoutButton');
+            const mobileAuthBtn = document.getElementById('mobileAuthButton');
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', loginWithGoogle);
+            }
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+            
+            if (mobileAuthBtn) {
+                mobileAuthBtn.addEventListener('click', loginWithGoogle);
             }
         });
         
