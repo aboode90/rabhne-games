@@ -2,13 +2,46 @@
 
 let allUsers = [];
 
+// Expose functions to global scope immediately
+window.loadUsers = loadUsers;
+window.setupSearch = setupSearch;
+window.setupForms = setupForms;
+window.showAddPoints = showAddPoints;
+window.removePoints = removePoints;
+window.toggleBlock = toggleBlock;
+window.closeModal = closeModal;
+window.formatDate = formatDate;
+
 document.addEventListener('DOMContentLoaded', function () {
+    // Expose functions immediately
+    window.loadUsers = loadUsers;
+    window.setupSearch = setupSearch;
+    window.setupForms = setupForms;
+    window.showAddPoints = showAddPoints;
+    window.removePoints = removePoints;
+    window.toggleBlock = toggleBlock;
+    window.closeModal = closeModal;
+    window.formatDate = formatDate;
+    
     setTimeout(async () => {
-        const isAdmin = await requireAdmin();
-        if (isAdmin) {
-            loadUsers();
-            setupSearch();
-            setupForms();
+        try {
+            const isAdmin = await requireAdmin();
+            if (isAdmin) {
+                loadUsers();
+                setupSearch();
+                setupForms();
+            }
+        } catch (error) {
+            console.error('Error initializing users admin functions:', error);
+            // Still expose functions
+            window.loadUsers = loadUsers;
+            window.setupSearch = setupSearch;
+            window.setupForms = setupForms;
+            window.showAddPoints = showAddPoints;
+            window.removePoints = removePoints;
+            window.toggleBlock = toggleBlock;
+            window.closeModal = closeModal;
+            window.formatDate = formatDate;
         }
     }, 1000);
 });
@@ -25,23 +58,33 @@ async function loadUsers() {
             });
         });
 
-        displayUsers(allUsers);
-
+        displayUsers();
     } catch (error) {
         console.error('Error loading users:', error);
         document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6">حدث خطأ أثناء التحميل</td></tr>';
     }
 }
 
-function displayUsers(users) {
+function displayUsers() {
     const tbody = document.getElementById('usersTableBody');
+    const searchTerm = document.getElementById('searchUsers')?.value.toLowerCase() || '';
 
-    if (users.length === 0) {
+    // Filter users based on search term
+    let filteredUsers = allUsers;
+    if (searchTerm) {
+        filteredUsers = allUsers.filter(user => 
+            (user.displayName && user.displayName.toLowerCase().includes(searchTerm)) ||
+            (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+            (user.id && user.id.toLowerCase().includes(searchTerm))
+        );
+    }
+
+    if (filteredUsers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6">لا توجد مستخدمين</td></tr>';
         return;
     }
 
-    tbody.innerHTML = users.map(user => `
+    tbody.innerHTML = filteredUsers.map(user => `
         <tr>
             <td>
                 ${user.displayName || 'غير محدد'}
@@ -72,33 +115,35 @@ function displayUsers(users) {
 
 function setupSearch() {
     const searchInput = document.getElementById('searchUsers');
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const filtered = allUsers.filter(user =>
-            (user.displayName || '').toLowerCase().includes(query) ||
-            user.email.toLowerCase().includes(query) ||
-            user.id.toLowerCase().includes(query)
-        );
-        displayUsers(filtered);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', displayUsers);
+    }
 }
 
 function setupForms() {
-    document.getElementById('addPointsForm').addEventListener('submit', handleAddPoints);
+    const addPointsForm = document.getElementById('addPointsForm');
+    if (addPointsForm) {
+        addPointsForm.addEventListener('submit', handleAddPoints);
+    }
 }
 
 function showAddPoints(userId, userName) {
-    document.getElementById('targetUserId').value = userId;
-    document.getElementById('targetUserName').textContent = userName;
+    document.getElementById('userId').value = userId;
+    document.getElementById('pointsUserName').textContent = userName;
     document.getElementById('addPointsModal').style.display = 'block';
 }
 
 async function handleAddPoints(e) {
     e.preventDefault();
-
-    const userId = document.getElementById('targetUserId').value;
+    
+    const userId = document.getElementById('userId').value;
     const points = parseInt(document.getElementById('pointsAmount').value);
     const reason = document.getElementById('pointsReason').value;
+
+    if (!userId || isNaN(points) || points <= 0 || !reason) {
+        showMessage('يرجى ملء جميع الحقول بشكل صحيح', 'error');
+        return;
+    }
 
     try {
         await db.collection('users').doc(userId).update({
@@ -153,7 +198,7 @@ async function removePoints(userId) {
 }
 
 async function toggleBlock(userId, isBlocked) {
-    const action = isBlocked ? 'إلغاء حظر' : 'حظر';
+    const action = isBlocked ? 'إلغاء الحظر' : 'حظر';
     if (!confirm(`هل أنت متأكد من ${action} هذا المستخدم؟`)) return;
 
     try {
@@ -171,5 +216,27 @@ async function toggleBlock(userId, isBlocked) {
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = 'none';
 }
+
+function formatDate(timestamp) {
+    if (!timestamp) return 'غير محدد';
+    
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleString('ar-SA', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Make functions globally available
+window.loadUsers = loadUsers;
+window.setupSearch = setupSearch;
+window.setupForms = setupForms;
+window.showAddPoints = showAddPoints;
+window.removePoints = removePoints;
+window.toggleBlock = toggleBlock;
+window.closeModal = closeModal;
+window.formatDate = formatDate;
