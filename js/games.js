@@ -7,29 +7,46 @@ let filteredGames = [];
 async function loadGames() {
     try {
         console.log('Loading games...');
+        
+        // Check if user is authenticated first
+        const user = firebase.auth().currentUser;
+        console.log('Current user:', user ? user.email : 'Not logged in');
+        
         const gamesSnapshot = await db.collection('games').get();
-        console.log('Games loaded:', gamesSnapshot.size);
+        console.log('Games loaded from DB:', gamesSnapshot.size);
 
         allGames = [];
         gamesSnapshot.forEach(doc => {
             const gameData = doc.data();
-            console.log('Game data:', gameData);
+            console.log('Game:', doc.id, gameData);
+            
+            // Add all games, check active status
             if (gameData.active === true) {
                 allGames.push({
                     id: doc.id,
                     slug: gameData.slug || doc.id,
                     ...gameData
                 });
+                console.log('Added active game:', gameData.title);
+            } else {
+                console.log('Skipped inactive game:', gameData.title);
             }
         });
 
-        console.log('Active games:', allGames.length);
+        console.log('Total active games:', allGames.length);
         filteredGames = [...allGames];
         displayGames();
 
     } catch (error) {
         console.error('Error loading games:', error);
-        showMessage('حدث خطأ أثناء تحميل الألعاب', 'error');
+        console.error('Error details:', error.code, error.message);
+        showMessage('حدث خطأ أثناء تحميل الألعاب: ' + error.message, 'error');
+        
+        // Show error in games grid
+        const gamesGrid = document.getElementById('gamesGrid');
+        if (gamesGrid) {
+            gamesGrid.innerHTML = `<p class="text-center" style="color: red;">خطأ: ${error.message}</p>`;
+        }
     } finally {
         const loadingEl = document.getElementById('loadingGames');
         if (loadingEl) loadingEl.style.display = 'none';
@@ -87,5 +104,14 @@ function getCategoryName(category) {
 
 // Initialize games page
 document.addEventListener('DOMContentLoaded', function () {
-    loadGames();
+    console.log('Games page DOM loaded');
+    
+    // Wait for Firebase to initialize
+    firebase.auth().onAuthStateChanged((user) => {
+        console.log('Auth state changed:', user ? user.email : 'No user');
+        loadGames();
+    });
+    
+    // Also try loading immediately
+    setTimeout(loadGames, 1000);
 });
