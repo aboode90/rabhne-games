@@ -3,33 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جميع الألعاب - Rabhne</title>
+    <title>جميع الألعاب - Rabhne v2.0</title>
     <meta name="description" content="جميع ألعاب HTML5 المتاحة في منصة Rabhne - العب واربح نقاط">
     <meta name="keywords" content="ألعاب HTML5, ألعاب مجانية, ألعاب عربية, كسب نقاط">
-    <link rel="stylesheet" href="css/style.css?v=2.2">
-    <link rel="stylesheet" href="css/mobile.css?v=2.2">
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="img/game.jpg" type="image/x-icon">
     
-    <!-- AdSense Code -->
+    <!-- AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
-    
-    <!-- AdCash Library -->
     <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
 </head>
 
-<body>
+<body data-theme="light">
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-logo float-animation">🎮 Rabhne</div>
+            <div class="nav-logo">
+                <span class="logo-icon">🎮</span>
+                <span class="logo-text">Rabhne</span>
+            </div>
+            
             <div class="nav-menu">
-                <a href="index.html" class="nav-link">الرئيسية</a>
-                <a href="games.html" class="nav-link">الألعاب</a>
+                <a href="/" class="nav-link">الرئيسية</a>
+                <a href="games.html" class="nav-link active">الألعاب</a>
+                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
+                <a href="earn.html" class="nav-link earn-link">💎 المهام</a>
+                
                 <div id="authButtons">
-                    <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول بجوجل</button>
+                    <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول</button>
                 </div>
+                
                 <div id="userMenu" style="display: none;">
                     <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
                     <span id="userName"></span>
@@ -40,46 +50,61 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="main-content">
         <div class="container">
+            <!-- Header -->
             <div class="dashboard-header">
                 <h1>🎮 مجموعة الألعاب المتقدمة</h1>
-                <p class="float-animation">🎆 اختر لعبتك المفضلة وابدأ في كسب النقاط فوراً! 💰</p>
+                <p>🎆 اختر لعبتك المفضلة وابدأ في كسب النقاط فوراً! 💰 - النظام المحسن v2.0</p>
             </div>
 
+            <!-- Games Filter -->
             <div class="games-filter">
-                <select id="categoryFilter" onchange="filterGames()">
-                    <option value="">جميع الفئات</option>
-                    <option value="action">أكشن</option>
-                    <option value="puzzle">ألغاز</option>
-                    <option value="racing">سباق</option>
-                    <option value="sports">رياضة</option>
-                    <option value="adventure">مغامرة</option>
-                </select>
+                <div class="filter-container">
+                    <select id="categoryFilter" class="filter-select" onchange="filterGames()">
+                        <option value="">جميع الفئات 🎯</option>
+                        <option value="action">أكشن ⚔️</option>
+                        <option value="puzzle">ألغاز 🧩</option>
+                        <option value="racing">سباق 🏎️</option>
+                        <option value="sports">رياضة ⚽</option>
+                        <option value="adventure">مغامرة 🗺️</option>
+                    </select>
+                    
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="ابحث عن لعبة..." onkeyup="searchGames()">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
             </div>
 
+            <!-- Games Grid -->
             <div id="gamesGrid" class="games-grid">
                 <!-- Games will be loaded here -->
             </div>
 
-            <div id="loadingGames" class="text-center">
+            <!-- Loading -->
+            <div id="loadingGames" class="loading-container">
+                <div class="loading-spinner"></div>
                 <p>جاري تحميل الألعاب...</p>
+            </div>
+
+            <!-- No Games Found -->
+            <div id="noGamesFound" class="no-games" style="display: none;">
+                <div class="no-games-icon">🎮</div>
+                <h3>لا توجد ألعاب</h3>
+                <p>لم يتم العثور على ألعاب تطابق البحث</p>
             </div>
         </div>
     </main>
 
-
-
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-bottom-nav">
         <a href="index.html" class="mobile-nav-item">
             <span class="mobile-nav-icon">🏠</span>
             <span class="mobile-nav-text">الرئيسية</span>
         </a>
-        <a href="games.html" class="mobile-nav-item">
+        <a href="games.html" class="mobile-nav-item active">
             <span class="mobile-nav-icon">🎮</span>
             <span class="mobile-nav-text">الألعاب</span>
         </a>
@@ -93,20 +118,26 @@
         </div>
     </div>
 
-    <script src="js/firebase-config.js?v=2.2"></script>
-    <script src="js/auth.js?v=2.2"></script>
-    <script src="js/games.js?v=2.2"></script>
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
-    <!-- Video.js and Contrib Ads -->
-    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/6.9.0/videojs-contrib-ads.min.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/games.js"></script>
     
-    <!-- AdCash AutoTag Code -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
+    
+    <!-- AdCash -->
     <script type="text/javascript">
         aclib.runAutoTag({
             zoneId: 'uvhasp50cf',
         });
     </script>
 </body>
-
 </html>
