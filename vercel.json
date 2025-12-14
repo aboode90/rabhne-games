@@ -14,18 +14,10 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/games/(.*)",
-      "dest": "/game.html"
+      "source": "/games/(.*)",
+      "destination": "/game.html"
     }
   ],
   "headers": [
