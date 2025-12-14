@@ -65,3 +65,8 @@ function formatTime(timestamp) {
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleString('ar-SA');
 }
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { auth, db, firebase, APP_CONFIG };
+}
