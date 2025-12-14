@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة لعبة - Rabhne</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .add-game-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎮 Rabhne Games</div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="games.html" class="nav-link">الألعاب</a>
+                <a href="earn.html" class="nav-link">اكسب نقاط</a>
+                <a href="withdraw.html" class="nav-link">سحب الأرباح</a>
+                <a href="profile.html" class="nav-link">الملف الشخصي</a>
+                <div id="authButtons">
+                    <button class="btn btn-primary" onclick="login()">تسجيل الدخول</button>
+                </div>
+                <div id="userMenu" style="display: none; align-items: center; gap: 15px;">
+                    <span id="userName"></span>
+                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="add-game-container">
+            <h1>إضافة لعبة جديدة</h1>
+            <p>هذه الصفحة مخصصة للمسؤولين فقط لإضافة الألعاب إلى الموقع</p>
+            
+            <div id="message" class="message"></div>
+            <div id="loading" class="loading">جاري المعالجة...</div>
+            
+            <form id="addGameForm">
+                <div class="form-group">
+                    <label for="gameTitle">عنوان اللعبة:</label>
+                    <input type="text" id="gameTitle" required placeholder="مثال: Foxy Eco Sort">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gameSlug">Slug (معرف فريد):</label>
+                    <input type="text" id="gameSlug" required placeholder="مثال: foxy-eco-sort">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gameIframe">رابط iframe:</label>
+                    <input type="url" id="gameIframe" required placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gameThumbnail">رابط الصورة المصغرة:</label>
+                    <input type="url" id="gameThumbnail" required placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gameCategory">الفئة:</label>
+                    <select id="gameCategory" required>
+                        <option value="">اختر الفئة</option>
+                        <option value="action">أكشن</option>
+                        <option value="puzzle">ألغاز</option>
+                        <option value="racing">سباق</option>
+                        <option value="sports">رياضة</option>
+                        <option value="adventure">مغامرة</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="gameActive" checked> اللعبة نشطة
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">إضافة اللعبة</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Pre-fill with Foxy Eco Sort data -->
+    <script>
+        // Pre-fill form with Foxy Eco Sort data
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('gameTitle').value = 'Foxy Eco Sort';
+            document.getElementById('gameSlug').value = 'foxy-eco-sort';
+            document.getElementById('gameIframe').value = 'https://html5.gamedistribution.com/rvvASWA4/8e3527971f5c4457b0691897f02111bb/index.html';
+            document.getElementById('gameThumbnail').value = 'https://img.gamedistribution.com/8e3527971f5c4457b0691897f02111bb-512x384.jpeg';
+            document.getElementById('gameCategory').value = 'puzzle';
+        });
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Auth functions -->
+    <script src="js/auth.js"></script>
+    
+    <!-- Game addition logic -->
+    <script>
+        // Check if user is admin
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                document.getElementById('authButtons').style.display = 'none';
+                document.getElementById('userMenu').style.display = 'flex';
+                document.getElementById('userName').textContent = user.email;
+                
+                // Check if user is admin
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    const userData = userDoc.data();
+                    
+                    if (!userData || !userData.isAdmin) {
+                        showMessage('ليس لديك صلاحية للوصول لهذه الصفحة', 'error');
+                        document.getElementById('addGameForm').style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error checking admin status:', error);
+                    showMessage('حدث خطأ أثناء التحقق من الصلاحيات', 'error');
+                    document.getElementById('addGameForm').style.display = 'none';
+                }
+            } else {
+                showMessage('يجب تسجيل الدخول كمسؤول لإضافة الألعاب', 'error');
+                document.getElementById('addGameForm').style.display = 'none';
+            }
+        });
+        
+        // Handle form submission
+        document.getElementById('addGameForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('message').style.display = 'none';
+            
+            try {
+                const gameData = {
+                    title: document.getElementById('gameTitle').value,
+                    slug: document.getElementById('gameSlug').value,
+                    iframeUrl: document.getElementById('gameIframe').value,
+                    thumbnailUrl: document.getElementById('gameThumbnail').value,
+                    category: document.getElementById('gameCategory').value,
+                    isActive: document.getElementById('gameActive').checked,
+                    plays: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Check if slug already exists
+                const existingGame = await db.collection('games')
+                    .where('slug', '==', gameData.slug)
+                    .get();
+                    
+                if (!existingGame.empty) {
+                    throw new Error('هذا المعرف مستخدم بالفعل');
+                }
+                
+                // Add game to Firestore
+                const docRef = await db.collection('games').add(gameData);
+                
+                // Show success message
+                showMessage(`تمت إضافة اللعبة بنجاح! المعرف: ${docRef.id}`, 'success');
+                
+                // Reset form
+                this.reset();
+                
+                // Pre-fill with Foxy Eco Sort data again
+                document.getElementById('gameTitle').value = 'Foxy Eco Sort';
+                document.getElementById('gameSlug').value = 'foxy-eco-sort';
+                document.getElementById('gameIframe').value = 'https://html5.gamedistribution.com/rvvASWA4/8e3527971f5c4457b0691897f02111bb/index.html';
+                document.getElementById('gameThumbnail').value = 'https://img.gamedistribution.com/8e3527971f5c4457b0691897f02111bb-512x384.jpeg';
+                document.getElementById('gameCategory').value = 'puzzle';
+                
+            } catch (error) {
+                console.error('Error adding game:', error);
+                showMessage('حدث خطأ: ' + error.message, 'error');
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+        
+        // Show message function
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
