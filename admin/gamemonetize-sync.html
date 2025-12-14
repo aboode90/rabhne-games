@@ -43,9 +43,20 @@
                 <div class="form-group">
                     <label>Game Feed URL:</label>
                     <input type="url" id="gameFeedUrl" value="https://gamemonetize.com/feed.php?format=0&num=50&page=1">
-                    <small>رابط Game Feed الخاص بك - تم تحديثه تلقائياً</small>
+                    <small>⚠️ استخدم الرابط من حسابك في GameMonetize → Game Feed</small>
+                    <br><small>مثال: https://gamemonetize.com/feed.php?format=0&num=50&page=1&user_id=YOUR_ID</small>
                 </div>
                 <button class="btn btn-primary" onclick="saveConfig()">💾 حفظ الإعدادات</button>
+                
+                <div class="alert" style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+                    <h4>📝 كيفية الحصول على Game Feed URL الصحيح:</h4>
+                    <ol>
+                        <li>اذهب إلى <a href="https://gamemonetize.com/account/gamefeed.php" target="_blank">GameMonetize Game Feed</a></li>
+                        <li>اختر الإعدادات: JSON, 50 games, All categories</li>
+                        <li>اضغط "Generate Feed"</li>
+                        <li>انسخ الرابط الناتج وضعه في الحقل أعلاه</li>
+                    </ol>
+                </div>
             </div>
 
             <div class="admin-card">
@@ -57,6 +68,9 @@
                     </button>
                     <button class="btn btn-secondary" onclick="testConnection()">
                         🔍 اختبار الاتصال
+                    </button>
+                    <button class="btn btn-warning" onclick="addDemoGames()">
+                        🎮 إضافة ألعاب تجريبية
                     </button>
                 </div>
                 <div id="syncStatus" class="sync-status"></div>
@@ -96,6 +110,7 @@
     <script src="../js/firebase-config.js?v=2.2"></script>
     <script src="../js/auth.js?v=2.2"></script>
     <script src="../js/gamemonetize.js?v=2.2"></script>
+    <script src="../js/demo-games.js?v=2.2"></script>
     
     <script>
         // التحقق من صلاحيات الإدارة
