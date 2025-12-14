@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اللعبة - Rabhne</title>
-    <meta name="description" content=" العب اللعبة HTML5 على منصة Rabhne واربح نقاط">
+    <meta name="description" content=" العب لعبة HTML5 على منصة Rabhne واربح نقاط">
     <meta name="keywords" content="لعبة HTML5, ألعاب عربية, كسب نقاط">
     <link rel="stylesheet" href="css/style.css?v=2.2">
     <link rel="stylesheet" href="css/mobile.css?v=2.2">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="img/game.jpg" type="image/x-icon">
     
     <!-- AdSense Code -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
+    
+    <!-- AdCash Library -->
+    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
 </head>
 
 <body>
@@ -45,7 +50,7 @@
             <div class="game-frame-container">
                 <div id="gameStartMessage" class="game-start-message">
                     <h2>🎮 مرحباً بك في اللعبة!</h2>
-                    <p>اضغط على زر "ابدأ اللعب" لبدء العداد والحصول على النقاط</p>
+                    <p>اضغط على زر "ابدأ اللعب" لبدء العدادAndGet نقاط</p>
                     <div class="game-info-box">
                         <p>💰 ستحصل على نقطة واحدة كل 30 ثانية</p>
                     </div>
@@ -54,11 +59,14 @@
                     <div class="lock-content">
                         <div class="lock-icon">🔒</div>
                         <h2>اللعبة مقفلة</h2>
-                        <p>شاهد إعلان قصير لفتح اللعبة لمدة 5 دقائق</p>
-                        <button id="btnWatchAd" onclick="showRewardedAd(unlockGame)"
+                        <p>شاهد إعلان قصير لفتح اللعبة</p>
+                        <button id="btnWatchAd" onclick="showAdCashVideoAd()"
                             class="btn btn-primary pulse-animation">
-                            🔓 شاهد فيديو لفتح اللعبة
+                            🎬 شاهد فيديو لفتح اللعبة
                         </button>
+                        <p style="margin-top: 15px; font-size: 14px; color: #ccc;">
+                            بعد مشاهدة الإعلان، ستفتح اللعبة تلقائياً
+                        </p>
                     </div>
                 </div>
 
@@ -100,16 +108,18 @@
                     <li>اتبع التعليمات داخل اللعبة</li>
                     <li>اضغط على "احصل على نقاط" كل 5 دقائق</li>
                     <li>اجمع النقاط واسحبها كاش حقيقي!</li>
+                    <li><strong>شاهد إعلان لفتح اللعبة أولاً</strong></li>
                 </ul>
             </div>
         </div>
     </main>
 
-
-
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Video.js and Contrib Ads -->
+    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/6.9.0/videojs-contrib-ads.min.js"></script>
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-bottom-nav">
         <a href="index.html" class="mobile-nav-item">
@@ -136,8 +146,6 @@
     <script src="js/simple-game.js?v=2.2"></script>
     <script src="js/game.js?v=2.2"></script>
     <script src="js/pwa.js"></script>
-    <!-- AdCash Library -->
-    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
     
     <!-- AdCash AutoTag Code -->
     <script type="text/javascript">

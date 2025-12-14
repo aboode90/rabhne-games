@@ -347,3 +347,28 @@
         font-size: 1.4rem;
     }
 }
+
+/* AdCash Video Ad Mobile Styles */
+@media (max-width: 768px) {
+    #adcash-video-ad {
+        padding: 10px;
+    }
+    
+    .lock-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    #adcash-ad-container {
+        width: 95%;
+        height: 200px;
+    }
+    
+    .lock-content h2 {
+        font-size: 1.2rem;
+    }
+    
+    .lock-content p {
+        font-size: 0.9rem;
+    }
+}
