@@ -46,19 +46,19 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadGames() {
     try {
         console.log('Loading games from database...');
-        const gamesSnapshot = await db.collection('games')
-            .orderBy('createdAt', 'desc')
-            .get();
+        const gamesSnapshot = await db.collection('games').get();
         
         console.log('Games loaded:', gamesSnapshot.size);
         allGames = [];
         gamesSnapshot.forEach(doc => {
+            const gameData = doc.data();
             allGames.push({
                 id: doc.id,
-                ...doc.data()
+                ...gameData
             });
         });
         
+        console.log('All games:', allGames);
         displayGames();
         
     } catch (error) {
@@ -150,7 +150,7 @@ async function handleAddGame(e) {
         title: document.getElementById('gameTitle').value,
         slug: document.getElementById('gameSlug').value,
         iframeUrl: document.getElementById('gameIframe').value,
-        thumbnailUrl: document.getElementById('gameThumbnail').value,
+        thumbnail: document.getElementById('gameThumbnail').value,
         category: document.getElementById('gameCategory').value,
         active: document.getElementById('gameActive').checked,
         plays: 0,
