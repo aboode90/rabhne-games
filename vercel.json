@@ -12,12 +12,20 @@
     {
       "src": "css/**/*.css",
       "use": "@vercel/static"
+    },
+    {
+      "src": "admin/**/*.html",
+      "use": "@vercel/static"
     }
   ],
   "rewrites": [
     {
       "source": "/games/(.*)",
       "destination": "/game.html"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "/admin/$1"
     }
   ],
   "headers": [
