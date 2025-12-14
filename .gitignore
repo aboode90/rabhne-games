@@ -134,5 +134,18 @@ Thumbs.db
 .env.test.local
 .env.production.local
 
+# Security - Never commit these
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+config/secrets.js
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
 # Vercel
 .vercel/

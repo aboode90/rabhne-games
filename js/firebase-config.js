@@ -1,6 +1,7 @@
-// Firebase Configuration
+// Firebase Configuration - API keys are safe for client-side use
+// These are public identifiers, not secret keys
 const firebaseConfig = {
-    apiKey: "AIzaSyDSwDU_B4OgMo2gh2vfbX7UEi6Cef9AUZM",
+    apiKey: "AIzaSyDSwDU_B4OgMo2gh2vfbX7UEi6Cef9AUZM", // Public API key - safe to expose
     authDomain: "www.rabhne.online",
     projectId: "rabhne-game-site",
     storageBucket: "rabhne-game-site.firebasestorage.app",
@@ -36,7 +37,8 @@ function showMessage(message, type = 'info') {
 
     const alertDiv = document.createElement('div');
     alertDiv.className = `toast-notification toast-${type}`;
-    alertDiv.textContent = message;
+    // Prevent XSS by using textContent instead of innerHTML
+    alertDiv.textContent = String(message).substring(0, 200); // Limit message length
 
     // إضافة الرسالة في أعلى الصفحة
     document.body.appendChild(alertDiv);

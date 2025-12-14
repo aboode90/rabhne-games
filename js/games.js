@@ -7,18 +7,20 @@ let filteredGames = [];
 async function loadGames() {
     try {
         console.log('Loading games...');
-        const gamesSnapshot = await db.collection('games').where('active', '==', true).get();
+        const gamesSnapshot = await db.collection('games').get();
         console.log('Games loaded:', gamesSnapshot.size);
 
         allGames = [];
         gamesSnapshot.forEach(doc => {
             const gameData = doc.data();
             console.log('Game data:', gameData);
-            allGames.push({
-                id: doc.id,
-                slug: doc.id,
-                ...gameData
-            });
+            if (gameData.active === true) {
+                allGames.push({
+                    id: doc.id,
+                    slug: gameData.slug || doc.id,
+                    ...gameData
+                });
+            }
         });
 
         console.log('Active games:', allGames.length);

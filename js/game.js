@@ -50,12 +50,8 @@ async function loadGame() {
     }
 }
 
-// Show AdCash VAST video ad before unlocking game
+// Show AdCash video ad before unlocking game
 function showAdCashVideoAd() {
-    // Hide game frame and show lock overlay
-    document.getElementById('gameFrame').style.display = 'none';
-    document.getElementById('gameLockOverlay').style.display = 'flex';
-    
     // Create AdCash video ad container
     const adContainer = document.createElement('div');
     adContainer.id = 'adcash-video-ad';
@@ -74,79 +70,85 @@ function showAdCashVideoAd() {
     `;
     
     adContainer.innerHTML = `
-        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 90%;">
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 90%; max-height: 90%;">
             <h3>🎬 شاهد الإعلان لفتح اللعبة</h3>
             <p>سيتم فتح اللعبة تلقائياً بعد مشاهدة الإعلان</p>
-            <div id="adcash-ad-container" style="margin: 20px 0; width: 640px; height: 360px;">
-                <div id="video-player-container">
-                    <video id="adcash-video-player" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360">
-                        <source src="" type="video/mp4">
-                    </video>
+            <div id="adcash-ad-container" style="margin: 20px 0; width: 100%; height: 400px; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">
+                <div id="ad-loading" style="text-align: center;">
+                    <p>جاري تحميل الإعلان...</p>
+                    <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
                 </div>
             </div>
-            <button id="close-ad-btn" class="btn btn-secondary" style="display: none;">إغلاق</button>
+            <button id="close-ad-btn" class="btn btn-primary" onclick="simulateAdComplete()" style="margin-top: 10px;">تخطي الإعلان (للاختبار)</button>
         </div>
     `;
     
     document.body.appendChild(adContainer);
     
-    // Load AdCash VAST video ad with REAL VAST URL
-    loadAdCashVASTAd();
+    // Load real AdCash ad
+    loadRealAdCashAd();
 }
 
-// Load AdCash VAST Video Ad with REAL URL
-function loadAdCashVASTAd() {
-    // AdCash REAL VAST Tag URL ( PROVIDED BY YOU )
-    const vastTagUrl = 'https://youradexchange.com/video/select.php?r=10711262';
+// Load real AdCash ad
+function loadRealAdCashAd() {
+    const adContainer = document.getElementById('adcash-ad-container');
     
-    // Create video player
-    const videoContainer = document.getElementById('video-player-container');
-    if (videoContainer) {
-        // Load Video.js CSS
-        const videoCSS = document.createElement('link');
-        videoCSS.rel = 'stylesheet';
-        videoCSS.href = 'https://vjs.zencdn.net/8.6.1/video-js.css';
-        document.head.appendChild(videoCSS);
-        
-        // Load Video.js and IMA plugin
-        const videoScript = document.createElement('script');
-        videoScript.src = 'https://vjs.zencdn.net/8.6.1/video.min.js';
-        document.head.appendChild(videoScript);
-        
-        const imaScript = document.createElement('script');
-        imaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/6.9.0/videojs-contrib-ads.min.js';
-        document.head.appendChild(imaScript);
-        
-        videoScript.onload = function() {
-            imaScript.onload = function() {
-                // Initialize player
-                const player = videojs('adcash-video-player', {
-                    autoplay: true,
-                    controls: true,
-                    responsive: true
-                });
+    // Try to load AdCash ad using their script
+    try {
+        // AdCash zone integration
+        if (typeof aclib !== 'undefined') {
+            // Use AdCash video ad zone
+            aclib.runVideoAd({
+                zoneId: 'uvhasp50cf', // Your AdCash zone ID
+                onComplete: function() {
+                    console.log('AdCash ad completed');
+                    unlockGameAfterAd();
+                },
+                onError: function() {
+                    console.log('AdCash ad error');
+                    simulateAdComplete();
+                }
+            });
+        } else {
+            // Fallback: simulate ad loading
+            setTimeout(() => {
+                adContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h4>🎬 إعلان تجريبي</h4>
+                        <p>هذا إعلان تجريبي - سيتم استبداله بإعلان حقيقي</p>
+                        <div style="background: #000; color: white; padding: 20px; margin: 20px 0;">
+                            <p>📺 فيديو إعلاني (5 ثوان)</p>
+                            <div id="countdown" style="font-size: 24px; font-weight: bold;">5</div>
+                        </div>
+                    </div>
+                `;
                 
-                // Load VAST ad
-                player.ready(function() {
-                    player.ads();
+                // Countdown timer
+                let countdown = 5;
+                const timer = setInterval(() => {
+                    countdown--;
+                    const countdownEl = document.getElementById('countdown');
+                    if (countdownEl) {
+                        countdownEl.textContent = countdown;
+                    }
                     
-                    // Play VAST ad
-                    player.src(vastTagUrl);
-                    
-                    player.on('ended', function() {
-                        console.log('AdCash VAST ad completed');
+                    if (countdown <= 0) {
+                        clearInterval(timer);
                         unlockGameAfterAd();
-                    });
-                    
-                    player.on('error', function() {
-                        console.log('AdCash VAST ad error');
-                        showMessage('حدث خطأ في عرض الإعلان، يرجى المحاولة مرة أخرى', 'error');
-                        document.getElementById('close-ad-btn').style.display = 'block';
-                    });
-                });
-            };
-        };
+                    }
+                }, 1000);
+            }, 1000);
+        }
+    } catch (error) {
+        console.error('Error loading ad:', error);
+        simulateAdComplete();
     }
+}
+
+// Simulate ad completion for testing
+function simulateAdComplete() {
+    console.log('Simulating ad completion');
+    unlockGameAfterAd();
 }
 
 // Unlock game after watching ad
@@ -327,3 +329,4 @@ window.startGame = startGame;
 window.stopGame = stopGame;
 window.showAdCashVideoAd = showAdCashVideoAd;
 window.unlockGame = unlockGame;
+window.simulateAdComplete = simulateAdComplete;

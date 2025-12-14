@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة لعبة تلقائية - Rabhne</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        input, select, button { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .message { padding: 15px; margin: 20px 0; border-radius: 5px; display: none; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 إضافة لعبة تلقائية</h1>
+        <p>أدخل رابط اللعبة من GameDistribution وسيتم إضافتها تلقائياً</p>
+        
+        <div id="message" class="message"></div>
+        
+        <input type="url" id="gameUrl" placeholder="https://gamedistribution.com/games/game-name/" required>
+        <input type="text" id="gameTitle" placeholder="اسم اللعبة (اختياري)">
+        <select id="gameCategory">
+            <option value="puzzle">ألغاز</option>
+            <option value="action">أكشن</option>
+            <option value="racing">سباق</option>
+            <option value="sports">رياضة</option>
+            <option value="adventure">مغامرة</option>
+        </select>
+        
+        <button onclick="autoAddGame()">➕ إضافة اللعبة تلقائياً</button>
+        <button onclick="loginWithGoogle()" id="loginBtn">🔑 تسجيل الدخول أولاً</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        let currentUser = null;
+
+        // تسجيل الدخول
+        async function loginWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                currentUser = result.user;
+                showMessage('تم تسجيل الدخول بنجاح!', 'success');
+                document.getElementById('loginBtn').style.display = 'none';
+            } catch (error) {
+                showMessage('خطأ في تسجيل الدخول: ' + error.message, 'error');
+            }
+        }
+
+        // إضافة اللعبة تلقائياً
+        async function autoAddGame() {
+            if (!currentUser) {
+                showMessage('يجب تسجيل الدخول أولاً', 'error');
+                return;
+            }
+
+            const gameUrl = document.getElementById('gameUrl').value;
+            const customTitle = document.getElementById('gameTitle').value;
+            const category = document.getElementById('gameCategory').value;
+
+            if (!gameUrl) {
+                showMessage('يرجى إدخال رابط اللعبة', 'error');
+                return;
+            }
+
+            try {
+                // استخراج معلومات اللعبة من الرابط
+                const gameInfo = extractGameInfo(gameUrl);
+                
+                if (!gameInfo) {
+                    showMessage('رابط غير صحيح. يجب أن يكون من GameDistribution', 'error');
+                    return;
+                }
+
+                // بيانات اللعبة
+                const gameData = {
+                    title: customTitle || gameInfo.title,
+                    slug: gameInfo.slug,
+                    iframeUrl: gameInfo.iframeUrl,
+                    thumbnail: gameInfo.thumbnail,
+                    category: category,
+                    active: true,
+                    plays: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // التحقق من وجود اللعبة
+                const existingGame = await db.collection('games')
+                    .where('slug', '==', gameData.slug)
+                    .get();
+
+                if (!existingGame.empty) {
+                    showMessage('اللعبة موجودة بالفعل!', 'error');
+                    return;
+                }
+
+                // إضافة اللعبة
+                const docRef = await db.collection('games').add(gameData);
+                showMessage(`✅ تمت إضافة اللعبة بنجاح!\n🆔 المعرف: ${docRef.id}\n🎮 الاسم: ${gameData.title}`, 'success');
+                
+                // مسح النموذج
+                document.getElementById('gameUrl').value = '';
+                document.getElementById('gameTitle').value = '';
+
+            } catch (error) {
+                showMessage('خطأ في إضافة اللعبة: ' + error.message, 'error');
+            }
+        }
+
+        // استخراج معلومات اللعبة من الرابط
+        function extractGameInfo(url) {
+            try {
+                // مثال: https://gamedistribution.com/games/foxy-eco-sort/
+                const match = url.match(/gamedistribution\.com\/games\/([^\/]+)/);
+                if (!match) return null;
+
+                const gameName = match[1];
+                const slug = gameName;
+                
+                // قاموس الألعاب المعروفة
+                const knownGames = {
+                    'foxy-eco-sort': {
+                        title: 'Foxy Eco Sort',
+                        iframeUrl: 'https://html5.gamedistribution.com/rvvASWA4/8e3527971f5c4457b0691897f02111bb/index.html',
+                        thumbnail: 'https://img.gamedistribution.com/8e3527971f5c4457b0691897f02111bb-512x384.jpeg'
+                    }
+                };
+
+                if (knownGames[gameName]) {
+                    return {
+                        slug: slug,
+                        title: knownGames[gameName].title,
+                        iframeUrl: knownGames[gameName].iframeUrl,
+                        thumbnail: knownGames[gameName].thumbnail
+                    };
+                }
+
+                // للألعاب الجديدة - تخمين الروابط
+                return {
+                    slug: slug,
+                    title: gameName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                    iframeUrl: `https://html5.gamedistribution.com/rvvASWA4/${gameName}/index.html`,
+                    thumbnail: `https://img.gamedistribution.com/${gameName}-512x384.jpeg`
+                };
+
+            } catch (error) {
+                console.error('Error extracting game info:', error);
+                return null;
+            }
+        }
+
+        // إظهار الرسائل
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 8000);
+        }
+
+        // مراقبة حالة المصادقة
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('loginBtn').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
