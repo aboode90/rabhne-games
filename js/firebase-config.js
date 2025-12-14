@@ -15,6 +15,9 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// Enable Google Auth popup
+auth.useDeviceLanguage();
+
 // App constants
 const APP_CONFIG = {
     POINTS_PER_CLAIM: 1,

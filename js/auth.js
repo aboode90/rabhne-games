@@ -136,27 +136,39 @@ async function loginWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('email');
         provider.addScope('profile');
-
-        // إعدادات إضافية للمزود
+        
+        // تمكين خيارات إضافية للمزود
         provider.setCustomParameters({
-            'prompt': 'select_account'
+            prompt: 'select_account'
         });
 
+        // محاولة تسجيل الدخول
         const result = await auth.signInWithPopup(provider);
-
+        
         if (result.user) {
             showMessage(`مرحباً بك ${result.user.displayName || 'مستخدم'}! تم تسجيل الدخول بنجاح`, 'success');
+            return true;
         }
-
-        return true;
     } catch (error) {
         console.error('Login error:', error);
-
-        // عدم إظهار رسالة إذا أغلق المستخدم النافذة
-        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-            showMessage(getErrorMessage(error.code), 'error');
+        
+        // معالجة أنواع مختلفة من الأخطاء
+        if (error.code === 'auth/popup-blocked') {
+            showMessage('تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة وإعادة المحاولة', 'error');
+        } else if (error.code === 'auth/cancelled-popup-request') {
+            // لا تعرض رسالة لهذا الخطأ
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            // لا تعرض رسالة لهذا الخطأ
+        } else if (error.code === 'auth/network-request-failed') {
+            showMessage('خطأ في الاتصال بالإنترنت. تأكد من اتصالك وحاول مرة أخرى', 'error');
+        } else if (error.code === 'auth/too-many-requests') {
+            showMessage('محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى', 'error');
+        } else if (error.code === 'auth/operation-not-allowed') {
+            showMessage('تسجيل الدخول بجوجل غير مفعل. يرجى التواصل مع الإدارة', 'error');
+        } else {
+            showMessage('حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى', 'error');
         }
-
+        
         return false;
     }
 }
@@ -171,28 +183,6 @@ async function logout() {
         showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
     }
 }
-
-// Error messages in Arabic
-function getErrorMessage(errorCode) {
-    const messages = {
-        'auth/popup-blocked': 'تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة وإعادة المحاولة',
-        'auth/cancelled-popup-request': 'تم إلغاء عملية تسجيل الدخول',
-        'auth/popup-closed-by-user': 'تم إغلاق نافذة تسجيل الدخول',
-        'auth/account-exists-with-different-credential': 'يوجد حساب بنفس البريد الإلكتروني بطريقة دخول مختلفة',
-        'auth/network-request-failed': 'خطأ في الاتصال بالإنترنت. تأكد من اتصالك وحاول مرة أخرى',
-        'auth/too-many-requests': 'محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى',
-        'auth/operation-not-allowed': 'تسجيل الدخول بجوجل غير مفعل. يرجى التواصل مع الإدارة',
-        'auth/invalid-api-key': 'خطأ في إعدادات التطبيق. يرجى التواصل مع الإدارة',
-        'auth/app-deleted': 'التطبيق غير متاح حالياً. يرجى المحاولة لاحقاً',
-        'auth/user-disabled': 'تم تعطيل حسابك. يرجى التواصل مع الإدارة'
-    };
-
-    return messages[errorCode] || 'حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى';
-}
-
-
-
-
 
 // Auth guard for protected pages
 function requireAuth() {
