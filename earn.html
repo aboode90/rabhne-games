@@ -24,6 +24,36 @@
             font-size: 1.2em;
             color: #666;
         }
+
+        .network-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .network-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: #f8f9fa;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .network-btn.active {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+
+        .network-content {
+            display: none;
+        }
+
+        .network-content.active {
+            display: block;
+        }
     </style>
 </head>
 
@@ -51,8 +81,24 @@
                 <p>أكمل المهام واحصل على آلاف النقاط!</p>
             </div>
 
-            <div id="wallContainer">
-                <div class="loading-wall">جاري تجهيز العروض لك...</div>
+            <!-- Network Selector -->
+            <div class="network-selector">
+                <button class="network-btn active" onclick="switchNetwork('mylead')">MyLead</button>
+                <button class="network-btn" onclick="switchNetwork('cpalead')">CPALead</button>
+            </div>
+
+            <!-- MyLead Content -->
+            <div id="mylead-content" class="network-content active">
+                <div id="wallContainer">
+                    <div class="loading-wall">جاري تجهيز العروض لك...</div>
+                </div>
+            </div>
+
+            <!-- CPALead Content -->
+            <div id="cpalead-content" class="network-content">
+                <div id="cpaleadContainer">
+                    <div class="loading-wall">جاري تجهيز عروض CPALead...</div>
+                </div>
             </div>
         </div>
     </main>
@@ -85,13 +131,33 @@
     <script>
         const OFFERWALL_URL = "https://reward-me.eu/68bbf3ce-d8bc-11f0-8770-c2a106037d45";
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('userName').textContent = user.displayName || user.email;
-                
-                // User is logged in, load wall with their ID
-                const wallUrl = `${OFFERWALL_URL}?player_id=${user.uid}`;
+        // Network switching function
+        function switchNetwork(network) {
+            // Update button states
+            document.querySelectorAll('.network-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
 
+            // Show selected content
+            document.querySelectorAll('.network-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${network}-content`).classList.add('active');
+
+            // Load content if user is authenticated
+            if (currentUser) {
+                if (network === 'mylead') {
+                    loadMyLeadWall();
+                } else if (network === 'cpalead') {
+                    loadCPALeadWall();
+                }
+            }
+        }
+
+        function loadMyLeadWall() {
+            if (currentUser) {
+                const wallUrl = `${OFFERWALL_URL}?player_id=${currentUser.uid}`;
                 document.getElementById('wallContainer').innerHTML = `
                     <iframe src="${wallUrl}" 
                             class="iframe-container"
@@ -105,12 +171,60 @@
                         يرجى عدم فتح تذكرة قبل مرور هذه المدة.
                     </div>
                 `;
+            }
+        }
+
+        function loadCPALeadWall() {
+            if (currentUser) {
+                // Replace with your actual CPALead publisher ID
+                const publisherId = 'YOUR_CPALEAD_PUBLISHER_ID';
+                const userId = currentUser.uid;
+                
+                document.getElementById('cpaleadContainer').innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <h3>🔗 CPALead عروض</h3>
+                        <p>اضغط على الزر أدناه للوصول إلى عروض CPALead</p>
+                        <button class="btn btn-primary" onclick="openCPALeadOffers('${publisherId}', '${userId}')">
+                            فتح عروض CPALead
+                        </button>
+                        <div class="alert alert-info" style="text-align: right; margin-top: 20px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 5px;">
+                            <strong>⚠️ ملاحظة هامة:</strong><br>
+                            يجب إكمال العروض مباشرة في نافذة CPALead لضمان احتساب النقاط.<br>
+                            سيتم احتساب النقاط تلقائياً بعد إكمال العروض.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function openCPALeadOffers(publisherId, userId) {
+            // This will open CPALead offers in a new window
+            // You'll need to replace this with your actual CPALead integration code
+            const cpaleadUrl = `https://www.cpalead.com/dashboard/pub/offers.php?id=${publisherId}&subid=${userId}`;
+            window.open(cpaleadUrl, '_blank');
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userName').textContent = user.displayName || user.email;
+                
+                // Load default network (MyLead)
+                loadMyLeadWall();
             } else {
                 // User not logged in
                 document.getElementById('wallContainer').innerHTML = `
                     <div style="text-align: center; padding: 40px; background: white; border-radius: 10px;">
                         <h3>🔒 يجب عليك تسجيل الدخول أولاً</h3>
                         <p>لرؤية العروض وكسب النقاط، يرجى تسجيل الدخول.</p>
+                        <button class="btn btn-primary" onclick="loginWithGoogle()">تسجيل الدخول</button>
+                    </div>
+                `;
+                
+                document.getElementById('cpaleadContainer').innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: white; border-radius: 10px;">
+                        <h3>🔒 يجب عليك تسجيل الدخول أولاً</h3>
+                        <p>لرؤية عروض CPALead وكسب النقاط، يرجى تسجيل الدخول.</p>
                         <button class="btn btn-primary" onclick="loginWithGoogle()">تسجيل الدخول</button>
                     </div>
                 `;
