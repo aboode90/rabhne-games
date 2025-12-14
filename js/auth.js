@@ -24,6 +24,9 @@ async function ensureUserDocument(user) {
     try {
         const userRef = db.collection('users').doc(user.uid);
         const userDoc = await userRef.get();
+        
+        // Check if user is the main admin
+        const isMainAdmin = user.email === 'abdullaalbder185@gmail.com';
 
         if (!userDoc.exists) {
             await userRef.set({
@@ -33,16 +36,22 @@ async function ensureUserDocument(user) {
                 points: 0,
                 dailyPoints: 0,
                 lastClaimAt: null,
-                isAdmin: false,
+                isAdmin: isMainAdmin, // Main admin gets admin rights automatically
                 blocked: false,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         } else {
-            // Update last login
-            await userRef.update({
+            // Update last login and ensure main admin has admin rights
+            const updateData = {
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+            
+            if (isMainAdmin) {
+                updateData.isAdmin = true;
+            }
+            
+            await userRef.update(updateData);
         }
     } catch (error) {
         console.error('Error ensuring user document:', error);

@@ -14,10 +14,39 @@ async function checkAdminAccess() {
     firebase.auth().onAuthStateChanged(async (user) => {
         if (user) {
             try {
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                const userData = userDoc.data();
+                console.log('Checking admin for user:', user.email);
                 
-                if (userData && userData.isAdmin === true) {
+                // Check if user is the main admin
+                const isMainAdmin = user.email === 'abdullaalbder185@gmail.com';
+                
+                const userRef = db.collection('users').doc(user.uid);
+                const userDoc = await userRef.get();
+                
+                if (!userDoc.exists) {
+                    // Create user document
+                    await userRef.set({
+                        email: user.email,
+                        displayName: user.displayName,
+                        isAdmin: isMainAdmin, // Only main admin gets admin rights
+                        points: 0,
+                        dailyPoints: 0,
+                        blocked: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log('Created user document, admin:', isMainAdmin);
+                } else if (isMainAdmin) {
+                    // Ensure main admin has admin rights
+                    await userRef.update({ isAdmin: true });
+                    console.log('Ensured main admin rights');
+                }
+                
+                const userData = userDoc.exists ? userDoc.data() : { isAdmin: isMainAdmin };
+                const hasAdminRights = userData.isAdmin === true || isMainAdmin;
+                
+                console.log('User data:', userData, 'Has admin rights:', hasAdminRights);
+                
+                if (hasAdminRights) {
+                    console.log('User has admin access, loading games...');
                     await loadGames();
                     setupEventListeners();
                 } else {
@@ -25,7 +54,8 @@ async function checkAdminAccess() {
                     setTimeout(() => window.location.href = '../index.html', 2000);
                 }
             } catch (error) {
-                showMessage('خطأ في التحقق من الصلاحيات', 'error');
+                console.error('Error checking admin:', error);
+                showMessage('خطأ في التحقق من الصلاحيات: ' + error.message, 'error');
             }
         } else {
             showMessage('يجب تسجيل الدخول أولاً', 'error');
@@ -37,17 +67,24 @@ async function checkAdminAccess() {
 // Load all games
 async function loadGames() {
     try {
+        console.log('Loading games...');
         showLoading();
-        const gamesSnapshot = await db.collection('games').orderBy('createdAt', 'desc').get();
+        
+        // Try without orderBy first
+        const gamesSnapshot = await db.collection('games').get();
+        console.log('Games snapshot size:', gamesSnapshot.size);
         
         allGames = [];
         gamesSnapshot.forEach(doc => {
+            const gameData = doc.data();
+            console.log('Game found:', doc.id, gameData.title);
             allGames.push({
                 id: doc.id,
-                ...doc.data()
+                ...gameData
             });
         });
         
+        console.log('Total games loaded:', allGames.length);
         filteredGames = [...allGames];
         updateStatistics();
         displayGames();
@@ -55,7 +92,26 @@ async function loadGames() {
     } catch (error) {
         console.error('Error loading games:', error);
         showMessage('خطأ في تحميل الألعاب: ' + error.message, 'error');
-        showEmptyState('حدث خطأ في تحميل الألعاب');
+        
+        // Try alternative loading method
+        try {
+            console.log('Trying alternative loading...');
+            const altSnapshot = await db.collection('games').limit(10).get();
+            console.log('Alternative snapshot size:', altSnapshot.size);
+            
+            allGames = [];
+            altSnapshot.forEach(doc => {
+                allGames.push({ id: doc.id, ...doc.data() });
+            });
+            
+            filteredGames = [...allGames];
+            updateStatistics();
+            displayGames();
+            
+        } catch (altError) {
+            console.error('Alternative loading failed:', altError);
+            showEmptyState('حدث خطأ في تحميل الألعاب');
+        }
     }
 }
 
