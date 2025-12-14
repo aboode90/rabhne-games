@@ -164,19 +164,26 @@
     <script src="js/main.js"></script>
     
     <script>
-        // Hide loading screen when ready
-        window.addEventListener('load', () => {
+        // Show loading screen immediately
+        document.addEventListener('DOMContentLoaded', () => {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) {
-                setTimeout(() => {
-                    loadingScreen.style.opacity = '0';
-                    setTimeout(() => loadingScreen.remove(), 300);
-                }, 1000);
+                loadingScreen.style.display = 'flex';
             }
         });
         
-        // Simple test
-        console.log('Script loaded');
+        // Hide loading screen when everything is loaded
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 1500); // Wait 1.5 seconds to ensure everything is loaded
+        });
         
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
