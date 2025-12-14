@@ -5,6 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة الألعاب - لوحة الإدارة</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group small {
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar admin-nav">
@@ -154,6 +202,26 @@
             }, 3000);
         }
         
+        // Show add game modal
+        function showAddGame() {
+            console.log('showAddGame called');
+            const modal = document.getElementById('addGameModal');
+            if (modal) {
+                modal.style.display = 'block';
+                console.log('Modal shown');
+            } else {
+                console.error('Modal not found');
+            }
+        }
+        
+        // Close modal
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
         // Logout function
         function logout() {
             if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
@@ -165,6 +233,10 @@
                 });
             }
         }
+        
+        // Make functions global
+        window.showAddGame = showAddGame;
+        window.closeModal = closeModal;
     </script>
 </body>
 </html>
