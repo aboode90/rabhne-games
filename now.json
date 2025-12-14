@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "rabhne-games",
+  "builds": [
+    {
+      "src": "**",
+      "use": "@now/static"
+    }
+  ]
+}
