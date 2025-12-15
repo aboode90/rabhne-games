@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           photoURL: firebaseUser.photoURL || userData.photoURL,
           points: userData.points || 0,
           pointsToday: userData.pointsToday || 0,
-          status: userData.status || 'active',
+          status: (userData.status as 'active' | 'suspended' | 'banned') || 'active',
           isAdmin: userData.isAdmin || false,
           createdAt: userData.createdAt?.toDate() || new Date(),
           lastLoginAt: userData.lastLoginAt?.toDate() || new Date(),
@@ -86,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser({
               uid: firebaseUser.uid,
               ...newUser,
+              status: 'active' as const,
             })
           } else {
             // Update last login
