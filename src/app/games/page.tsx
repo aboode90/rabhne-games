@@ -178,7 +178,12 @@ export default function GamesPage() {
               <React.Fragment key={game.id}>
                 {index === 4 && (
                   <div className="col-span-full mb-6">
-                    <AdSense adSlot="9876543210" adFormat="fluid" style={{ display: 'block', minHeight: '100px' }} />
+                    <AdSense 
+                      adSlot="3560444746" 
+                      adFormat="fluid"
+                      adLayoutKey="-fb+5w+4e-db+86"
+                      style={{ display: 'block', minHeight: '100px' }} 
+                    />
                   </div>
                 )}
                 <Card hover className="overflow-hidden">
