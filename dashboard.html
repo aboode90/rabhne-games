@@ -17,9 +17,8 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/design-system.css">
-    <link rel="stylesheet" href="css/style.css?v=2.1">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="img/game.jpg" type="image/x-icon">
     
@@ -28,147 +27,141 @@
 </head>
 
 <body data-theme="light">
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span class="logo-icon">🎮</span>
-                <span class="logo-text">Rabhne</span>
-            </div>
-            
-            <div class="nav-menu">
-                <a href="/" class="nav-link">الرئيسية</a>
-                <a href="games.html" class="nav-link">الألعاب</a>
-                <a href="dashboard.html" class="nav-link active">لوحة التحكم</a>
-                <a href="earn.html" class="nav-link earn-link">💎 المهام</a>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🎮</span>
+                    <span>Rabhne</span>
+                </a>
                 
-                <div id="userMenu">
-                    <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
-                    <span id="userName"></span>
-                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
+                <nav class="nav">
+                    <a href="/" class="nav-link">الرئيسية</a>
+                    <a href="games.html" class="nav-link">الألعاب</a>
+                    <a href="earn.html" class="nav-link">💎 المهام</a>
+                    <a href="dashboard.html" class="nav-link active">لوحة التحكم</a>
+                </nav>
+                
+                <div class="user-menu">
+                    <div id="userMenu">
+                        <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
+                        <span id="userName" class="text-secondary"></span>
+                        <button class="btn btn-secondary btn-sm" onclick="logout()">خروج</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
 
     <!-- Main Content -->
-    <main class="main-content dashboard">
+    <main>
         <!-- Dashboard Hero -->
-        <section class="dashboard-hero">
-            <div class="hero-background">
-                <div class="hero-particles"></div>
-                <div class="hero-gradient"></div>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">مرحباً، <span id="dashboardUserName">المستخدم</span>! 👋</h1>
+                <p class="hero-subtitle">إدارة حسابك ونقاطك بسهولة مع النظام المحسن v3.0</p>
             </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="section">
             <div class="container">
-                <div class="dashboard-hero-content">
-                    <h1 class="hero-title">مرحباً، <span id="dashboardUserName">المستخدم</span>! 👋</h1>
-                    <p class="hero-subtitle">إدارة حسابك ونقاطك بسهولة مع النظام المحسن v2.0</p>
+                <h2 class="section-title">📊 إحصائيات حسابك</h2>
+
+                <div id="statsGrid" class="grid grid-cols-4">
+                    <div class="card text-center hover:translate-y-1">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;" id="userPoints">0</div>
+                        <div class="text-secondary">إجمالي النقاط</div>
+                    </div>
+                    <div class="card text-center hover:translate-y-1">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;" id="dailyPoints">0</div>
+                        <div class="text-secondary">نقاط اليوم</div>
+                    </div>
+                    <div class="card text-center hover:translate-y-1">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">💵</div>
+                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;" id="cashValue">$0.00</div>
+                        <div class="text-secondary">القيمة النقدية</div>
+                    </div>
+                    <div class="card text-center hover:translate-y-1">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;" id="remainingDaily">2880</div>
+                        <div class="text-secondary">المتبقي اليوم</div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <div class="container">
-            <!-- Stats Section -->
-            <section class="stats-section">
-                <h2 class="section-title">📊 إحصائيات حسابك</h2>
-
-                <div class="stats-grid">
-                    <div class="stat-card primary">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-number" id="userPoints">0</div>
-                        <div class="stat-label">إجمالي النقاط</div>
-                    </div>
-                    <div class="stat-card success">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-number" id="dailyPoints">0</div>
-                        <div class="stat-label">نقاط اليوم</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-icon">💵</div>
-                        <div class="stat-number" id="cashValue">$0.00</div>
-                        <div class="stat-label">القيمة النقدية</div>
-                    </div>
-                    <div class="stat-card info">
-                        <div class="stat-icon">⏳</div>
-                        <div class="stat-number" id="remainingDaily">2880</div>
-                        <div class="stat-label">المتبقي اليوم</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Ads Banner -->
-            <section class="ads-section">
-                <div class="ads-banner">
-                    <div class="ads-content">
-                        <div class="ads-icon">🎁</div>
-                        <div class="ads-text">
-                            <h3>💎 نقاط مجانية إضافية!</h3>
-                            <p>شاهد إعلانات قصيرة واحصل على نقاط إضافية فوراً</p>
-                        </div>
-                    </div>
-                    <button id="btnWatchAd" class="btn btn-large btn-primary pulse-animation" onclick="showRewardedAd()">
+        <!-- Ads Banner -->
+        <section class="section">
+            <div class="container">
+                <div class="card card-glass text-center" style="max-width: 600px; margin: 0 auto;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🎁</div>
+                    <h3 class="mb-2">💎 نقاط مجانية إضافية!</h3>
+                    <p class="text-secondary mb-6">شاهد إعلانات قصيرة واحصل على نقاط إضافية فوراً</p>
+                    <button id="btnWatchAd" class="btn btn-lg btn-primary animate-pulse" onclick="showRewardedAd()">
                         🎬 شاهد واربح (+10)
                     </button>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Quick Actions -->
-            <section class="actions-section">
+        <!-- Quick Actions -->
+        <section class="section">
+            <div class="container">
                 <h2 class="section-title">⚡ إجراءات سريعة</h2>
-                <div class="dashboard-actions">
-                    <a href="earn.html" class="action-card earn-card">
-                        <div class="action-icon">💎</div>
-                        <h3>المهام اليومية</h3>
-                        <p>أنجز مهام بسيطة واربح نقاط</p>
+                <div class="grid grid-auto-fit">
+                    <a href="earn.html" class="card hover:translate-y-1 text-center" style="text-decoration: none; color: inherit;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">💎</div>
+                        <h3 class="mb-2">المهام اليومية</h3>
+                        <p class="text-secondary mb-0">أنجز مهام بسيطة واربح نقاط</p>
                     </a>
-                    <a href="games.html" class="action-card games-card">
-                        <div class="action-icon">🎮</div>
-                        <h3>الألعاب</h3>
-                        <p>العب واستمتع واربح نقاط</p>
+                    <a href="games.html" class="card hover:translate-y-1 text-center" style="text-decoration: none; color: inherit;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎮</div>
+                        <h3 class="mb-2">الألعاب</h3>
+                        <p class="text-secondary mb-0">العب واستمتع واربح نقاط</p>
                     </a>
-                    <a href="withdraw.html" class="action-card withdraw-card">
-                        <div class="action-icon">💰</div>
-                        <h3>سحب الأرباح</h3>
-                        <p>حول نقاطك إلى أموال</p>
+                    <a href="withdraw.html" class="card hover:translate-y-1 text-center" style="text-decoration: none; color: inherit;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+                        <h3 class="mb-2">سحب الأرباح</h3>
+                        <p class="text-secondary mb-0">حول نقاطك إلى أموال</p>
                     </a>
-                    <a href="profile.html" class="action-card profile-card">
-                        <div class="action-icon">👤</div>
-                        <h3>الملف الشخصي</h3>
-                        <p>إدارة بياناتك</p>
+                    <a href="profile.html" class="card hover:translate-y-1 text-center" style="text-decoration: none; color: inherit;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">👤</div>
+                        <h3 class="mb-2">الملف الشخصي</h3>
+                        <p class="text-secondary mb-0">إدارة بياناتك</p>
                     </a>
-                    <a href="support.html" class="action-card support-card">
-                        <div class="action-icon">🎧</div>
-                        <h3>الدعم الفني</h3>
-                        <p>مساعدة ودعم 24/7</p>
+                    <a href="support.html" class="card hover:translate-y-1 text-center" style="text-decoration: none; color: inherit;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎧</div>
+                        <h3 class="mb-2">الدعم الفني</h3>
+                        <p class="text-secondary mb-0">مساعدة ودعم 24/7</p>
                     </a>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Recent Activity -->
-            <section class="activity-section">
-                <div class="activity-grid">
-                    <div class="activity-card">
-                        <h2>📊 العمليات الأخيرة</h2>
+        <!-- Recent Activity -->
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-cols-2">
+                    <div class="card">
+                        <h3 class="mb-4">📊 العمليات الأخيرة</h3>
                         <div id="recentTransactions">
-                            <div class="loading-container">
-                                <div class="loading-spinner"></div>
-                                <p>جاري تحميل العمليات...</p>
-                            </div>
+                            <!-- Loading will be shown here -->
                         </div>
                     </div>
 
-                    <div class="activity-card">
-                        <h2>💰 طلبات السحب</h2>
+                    <div class="card">
+                        <h3 class="mb-4">💰 طلبات السحب</h3>
                         <div id="withdrawHistory">
-                            <div class="loading-container">
-                                <div class="loading-spinner"></div>
-                                <p>جاري تحميل طلبات السحب...</p>
-                            </div>
+                            <!-- Loading will be shown here -->
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -226,36 +219,60 @@
     </footer>
 
     <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🏠</span>
-            <span class="mobile-nav-text">الرئيسية</span>
-        </a>
-        <a href="games.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🎮</span>
-            <span class="mobile-nav-text">الألعاب</span>
-        </a>
-        <a href="dashboard.html" class="mobile-nav-item active">
-            <span class="mobile-nav-icon">📋</span>
-            <span class="mobile-nav-text">لوحتي</span>
-        </a>
-        <a href="withdraw.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">💰</span>
-            <span class="mobile-nav-text">سحب</span>
-        </a>
-    </div>
+    <nav class="mobile-nav">
+        <div class="mobile-nav-content">
+            <a href="index.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-text">الرئيسية</span>
+            </a>
+            <a href="games.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">🎮</span>
+                <span class="mobile-nav-text">الألعاب</span>
+            </a>
+            <a href="earn.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💎</span>
+                <span class="mobile-nav-text">المهام</span>
+            </a>
+            <a href="dashboard.html" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">📋</span>
+                <span class="mobile-nav-text">لوحتي</span>
+            </a>
+            <a href="withdraw.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💰</span>
+                <span class="mobile-nav-text">سحب</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
+    <script src="assets/js/ui.js"></script>
     <script src="js/firebase-config.js?v=2.1"></script>
     <script src="js/ui-states.js"></script>
     <script src="js/auth.js?v=2.1"></script>
     <script src="js/main.js?v=2.1"></script>
     <script src="js/dashboard.js?v=2.1"></script>
     <script src="js/ads.js?v=2.1"></script>
+    
+    <script>
+        // Initialize dashboard page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show skeleton loading for stats
+            showSkeleton('#statsGrid', 'stats', 4);
+            
+            // Show loading for activity sections
+            showLoading('#recentTransactions', 'جاري تحميل العمليات...');
+            showLoading('#withdrawHistory', 'جاري تحميل طلبات السحب...');
+            
+            // Hide skeleton after data loads (simulate)
+            setTimeout(() => {
+                hideSkeleton('#statsGrid');
+            }, 1500);
+        });
+    </script>
     
     <script>
         // Auth guard

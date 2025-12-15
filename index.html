@@ -23,81 +23,70 @@
     <!-- Stylesheets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/design-system.css">
-    <link rel="stylesheet" href="/css/style.css?v=2.1">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
     
     <!-- AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
     <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
 </head>
 <body data-theme="light" data-online="true">
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-logo">🎮 Rabhne v2.0</div>
-            <div class="loading-spinner"></div>
-            <div class="loading-text">جاري التحميل...</div>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span class="logo-icon">🎮</span>
-                <span class="logo-text">Rabhne</span>
-            </div>
-            
-            <div class="nav-menu">
-                <a href="/" class="nav-link active">الرئيسية</a>
-                <a href="earn.html" class="nav-link earn-link">💎 المهام</a>
-                <a href="admin/index.html" class="nav-link">لوحة الإدارة</a>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🎮</span>
+                    <span>Rabhne</span>
+                </a>
                 
-                <div id="authButtons">
-                    <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول</button>
-                </div>
+                <nav class="nav">
+                    <a href="/" class="nav-link active">الرئيسية</a>
+                    <a href="games.html" class="nav-link">الألعاب</a>
+                    <a href="earn.html" class="nav-link">💎 المهام</a>
+                    <a href="dashboard.html" class="nav-link" id="navDashboard" style="display: none;">لوحة التحكم</a>
+                </nav>
                 
-                <div id="userMenu" style="display: none;">
-                    <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
-                    <span id="userName"></span>
-                    <a href="dashboard.html" class="btn btn-primary">لوحة التحكم</a>
-                    <button class="btn btn-secondary" id="logoutButton">خروج</button>
+                <div class="user-menu">
+                    <div id="authButtons">
+                        <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول</button>
+                    </div>
+                    
+                    <div id="userMenu" style="display: none;">
+                        <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
+                        <span id="userName" class="text-secondary"></span>
+                        <button class="btn btn-secondary btn-sm" onclick="logout()">خروج</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main>
         <!-- Hero Section -->
         <section class="hero">
-            <div class="hero-background">
-                <div class="hero-particles"></div>
-                <div class="hero-gradient"></div>
-            </div>
-            
             <div class="hero-content">
                 <h1 class="hero-title">🎮 العب واربح مع منصة Rabhne 💰</h1>
-                <p class="hero-subtitle">✨ النظام المحسن v2.0 - اكتشف عالم الألعاب الممتع واجمع النقاط وحولها إلى أرباح حقيقية ✨</p>
+                <p class="hero-subtitle">✨ النظام المحسن v3.0 - اكتشف عالم الألعاب الممتع واجمع النقاط وحولها إلى أرباح حقيقية ✨</p>
                 
-                <div class="hero-buttons">
-                    <a href="games.html" class="btn btn-large btn-primary pulse-animation">🎮 ابدأ اللعب الآن</a>
-                    <a href="earn.html" class="btn btn-large btn-secondary">💎 المهام اليومية</a>
+                <div class="hero-actions">
+                    <a href="games.html" class="btn btn-lg btn-primary animate-pulse">🎮 ابدأ اللعب الآن</a>
+                    <a href="earn.html" class="btn btn-lg btn-secondary">💎 المهام اليومية</a>
                 </div>
                 
-                <div class="hero-stats">
-                    <div class="stat-item">
+                <div class="stats">
+                    <div class="stat">
                         <span class="stat-number" id="statPlayers">+500</span>
                         <span class="stat-label">لاعب نشط</span>
                     </div>
                     <div class="stat-divider"></div>
-                    <div class="stat-item">
+                    <div class="stat">
                         <span class="stat-number" id="statPaid">$1,250</span>
                         <span class="stat-label">تم دفعها</span>
                     </div>
                     <div class="stat-divider"></div>
-                    <div class="stat-item">
+                    <div class="stat">
                         <span class="stat-number" id="statGames">15+</span>
                         <span class="stat-label">لعبة متاحة</span>
                     </div>
@@ -106,99 +95,115 @@
         </section>
 
         <!-- Features Section -->
-        <section class="features-section">
+        <section class="section">
             <div class="container">
                 <h2 class="section-title">🌟 مميزات المنصة</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
-                        <h3>سرعة فائقة</h3>
-                        <p>تحميل سريع وأداء محسن لتجربة لعب سلسة</p>
+                <div class="grid grid-auto-fit">
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+                            <h3 class="mb-2">سرعة فائقة</h3>
+                            <p class="text-secondary mb-0">تحميل سريع وأداء محسن لتجربة لعب سلسة</p>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🔒</div>
-                        <h3>أمان متقدم</h3>
-                        <p>حماية شاملة من التلاعب ونظام أمان متطور</p>
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                            <h3 class="mb-2">أمان متقدم</h3>
+                            <p class="text-secondary mb-0">حماية شاملة من التلاعب ونظام أمان متطور</p>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">📱</div>
-                        <h3>متوافق مع الجوال</h3>
-                        <p>يعمل بشكل مثالي على جميع الأجهزة والشاشات</p>
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+                            <h3 class="mb-2">متوافق مع الجوال</h3>
+                            <p class="text-secondary mb-0">يعمل بشكل مثالي على جميع الأجهزة والشاشات</p>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">💰</div>
-                        <h3>أرباح حقيقية</h3>
-                        <p>حول نقاطك إلى أموال حقيقية بسهولة</p>
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+                            <h3 class="mb-2">أرباح حقيقية</h3>
+                            <p class="text-secondary mb-0">حول نقاطك إلى أموال حقيقية بسهولة</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- How it Works Section -->
-        <section class="how-it-works">
+        <section class="section">
             <div class="container">
                 <h2 class="section-title">كيف تربح معنا؟ 🤑</h2>
-                <div class="steps-grid">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <div class="step-icon">👤</div>
-                        <h3>سجل حسابك</h3>
-                        <p>أنشئ حساب مجاني في ثوانٍ باستخدام Google وابدأ رحلتك</p>
+                <div class="grid grid-auto-fit">
+                    <div class="card text-center hover:translate-y-1">
+                        <div class="badge badge-primary mb-4" style="font-size: 1.5rem; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">1</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">👤</div>
+                        <h3 class="mb-2">سجل حسابك</h3>
+                        <p class="text-secondary mb-0">أنشئ حساب مجاني في ثوانٍ باستخدام Google وابدأ رحلتك</p>
                     </div>
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <div class="step-icon">🎮</div>
-                        <h3>العب واجمع</h3>
-                        <p>اختر من مجموعة متنوعة من الألعاب واجمع النقاط مع كل دقيقة لعب</p>
+                    <div class="card text-center hover:translate-y-1">
+                        <div class="badge badge-primary mb-4" style="font-size: 1.5rem; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">2</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎮</div>
+                        <h3 class="mb-2">العب واجمع</h3>
+                        <p class="text-secondary mb-0">اختر من مجموعة متنوعة من الألعاب واجمع النقاط مع كل دقيقة لعب</p>
                     </div>
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <div class="step-icon">💸</div>
-                        <h3>اسحب أرباحك</h3>
-                        <p>حول نقاطك إلى رصيد USDT واسحب أرباحك بسهولة</p>
+                    <div class="card text-center hover:translate-y-1">
+                        <div class="badge badge-primary mb-4" style="font-size: 1.5rem; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">3</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">💸</div>
+                        <h3 class="mb-2">اسحب أرباحك</h3>
+                        <p class="text-secondary mb-0">حول نقاطك إلى رصيد USDT واسحب أرباحك بسهولة</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Why Choose Us Section -->
-        <section class="why-us">
+        <section class="section">
             <div class="container">
                 <h2 class="section-title">لماذا تختار Rabhne؟ ⭐</h2>
-                <div class="benefits-grid">
-                    <div class="benefit-card">
-                        <div class="benefit-icon">📈</div>
-                        <h3>أرباح يومية مضمونة</h3>
-                        <p>فرص متجددة للربح وكسب النقاط على مدار الساعة مع نظام مكافآت يومي</p>
+                <div class="grid grid-auto-fit">
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                            <h3 class="mb-2">أرباح يومية مضمونة</h3>
+                            <p class="text-secondary mb-0">فرص متجددة للربح وكسب النقاط على مدار الساعة مع نظام مكافآت يومي</p>
+                        </div>
                     </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon">🛡️</div>
-                        <h3>أمان وموثوقية</h3>
-                        <p>بياناتك وأرباحك محمية بأعلى معايير الأمان العالمية</p>
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🛡️</div>
+                            <h3 class="mb-2">أمان وموثوقية</h3>
+                            <p class="text-secondary mb-0">بياناتك وأرباحك محمية بأعلى معايير الأمان العالمية</p>
+                        </div>
                     </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon">⚡</div>
-                        <h3>دفع سريع</h3>
-                        <p>معالجة طلبات السحب خلال 24 ساعة بدون تأخير</p>
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+                            <h3 class="mb-2">دفع سريع</h3>
+                            <p class="text-secondary mb-0">معالجة طلبات السحب خلال 24 ساعة بدون تأخير</p>
+                        </div>
                     </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon">🎯</div>
-                        <h3>ألعاب متنوعة</h3>
-                        <p>مجموعة كبيرة من الألعاب الممتعة لجميع الأعمار والاهتمامات</p>
+                    <div class="card hover:translate-y-1">
+                        <div class="text-center mb-4">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                            <h3 class="mb-2">ألعاب متنوعة</h3>
+                            <p class="text-secondary mb-0">مجموعة كبيرة من الألعاب الممتعة لجميع الأعمار والاهتمامات</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- CTA Section -->
-        <section class="cta-section">
+        <section class="section">
             <div class="container">
-                <div class="cta-content">
-                    <h2>🚀 ابدأ رحلتك الآن!</h2>
-                    <p>انضم إلى آلاف اللاعبين واربح أموال حقيقية من خلال اللعب</p>
-                    <div class="cta-buttons">
-                        <a href="games.html" class="btn btn-large btn-primary pulse-animation">🎮 ابدأ اللعب</a>
-                        <a href="dashboard.html" class="btn btn-large btn-secondary">📊 لوحة التحكم</a>
+                <div class="card card-glass text-center" style="max-width: 600px; margin: 0 auto;">
+                    <h2 class="mb-4">🚀 ابدأ رحلتك الآن!</h2>
+                    <p class="text-secondary mb-6">انضم إلى آلاف اللاعبين واربح أموال حقيقية من خلال اللعب</p>
+                    <div class="flex gap-4 justify-center flex-wrap">
+                        <a href="games.html" class="btn btn-lg btn-primary animate-pulse">🎮 ابدأ اللعب</a>
+                        <a href="dashboard.html" class="btn btn-lg btn-secondary">📊 لوحة التحكم</a>
                     </div>
                 </div>
             </div>
@@ -210,11 +215,11 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="footer-logo">
+                    <div class="logo mb-4">
                         <span class="logo-icon">🎮</span>
-                        <span class="logo-text">Rabhne v2.0</span>
+                        <span>Rabhne v3.0</span>
                     </div>
-                    <p class="footer-description">منصة الألعاب العربية الرائدة لربح الأموال الحقيقية</p>
+                    <p class="text-muted">منصة الألعاب العربية الرائدة لربح الأموال الحقيقية</p>
                 </div>
                 
                 <div class="footer-section">
@@ -232,84 +237,78 @@
                     <ul class="footer-links">
                         <li><a href="support.html">📞 الدعم الفني</a></li>
                         <li><a href="mailto:support@rabhne.online">✉️ البريد الإلكتروني</a></li>
-                        <li><a href="#">📜 الأسئلة الشائعة</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>معلومات المنصة</h4>
-                    <div class="footer-stats">
-                        <div class="footer-stat">
-                            <span class="stat-value">500+</span>
-                            <span class="stat-label">لاعب نشط</span>
+                    <h4>إحصائيات المنصة</h4>
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="card p-4 text-center">
+                            <div class="text-accent font-bold">500+</div>
+                            <div class="text-muted" style="font-size: var(--font-size-xs);">لاعب نشط</div>
                         </div>
-                        <div class="footer-stat">
-                            <span class="stat-value">$1,250</span>
-                            <span class="stat-label">تم دفعها</span>
+                        <div class="card p-4 text-center">
+                            <div class="text-accent font-bold">$1,250</div>
+                            <div class="text-muted" style="font-size: var(--font-size-xs);">تم دفعها</div>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <div class="footer-copyright">
-                    <p>&copy; 2024 Rabhne Games. جميع الحقوق محفوظة.</p>
-                    <p class="footer-version">النظام المحسن v2.0 - تم التطوير ب❤️ في المملكة العربية السعودية</p>
-                </div>
+                <p>&copy; 2024 Rabhne Games. جميع الحقوق محفوظة.</p>
+                <p class="text-muted">النظام المحسن v3.0 - تم التطوير ب❤️ في المملكة العربية السعودية</p>
             </div>
         </div>
     </footer>
 
     <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🏠</span>
-            <span class="mobile-nav-text">الرئيسية</span>
-        </a>
-        <a href="games.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🎮</span>
-            <span class="mobile-nav-text">الألعاب</span>
-        </a>
-        <a href="dashboard.html" class="mobile-nav-item" id="mobileNavDashboard" style="display: none;">
-            <span class="mobile-nav-icon">📋</span>
-            <span class="mobile-nav-text">لوحتي</span>
-        </a>
-        <div class="mobile-nav-item" onclick="loginWithGoogle()">
-            <span class="mobile-nav-icon">🔑</span>
-            <span class="mobile-nav-text">دخول</span>
+    <nav class="mobile-nav">
+        <div class="mobile-nav-content">
+            <a href="index.html" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-text">الرئيسية</span>
+            </a>
+            <a href="games.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">🎮</span>
+                <span class="mobile-nav-text">الألعاب</span>
+            </a>
+            <a href="earn.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💎</span>
+                <span class="mobile-nav-text">المهام</span>
+            </a>
+            <a href="dashboard.html" class="mobile-nav-item" id="mobileNavDashboard" style="display: none;">
+                <span class="mobile-nav-icon">📋</span>
+                <span class="mobile-nav-text">لوحتي</span>
+            </a>
+            <div class="mobile-nav-item" id="mobileAuthButton" onclick="loginWithGoogle()">
+                <span class="mobile-nav-icon">🔑</span>
+                <span class="mobile-nav-text">دخول</span>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
+    <script src="assets/js/ui.js"></script>
     <script src="js/firebase-config.js?v=2.1"></script>
     <script src="js/ui-states.js"></script>
     <script src="js/auth.js?v=2.1"></script>
     <script src="js/main.js?v=2.1"></script>
     
     <script>
-        // Show loading screen immediately
+        // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'flex';
-            }
-        });
-        
-        // Hide loading screen when everything is loaded
-        window.addEventListener('load', () => {
+            // Show skeleton loading for stats
+            showSkeleton('.stats', 'stats', 1);
+            
+            // Hide skeleton after data loads
             setTimeout(() => {
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                    }, 500);
-                }
-            }, 1500); // Wait 1.5 seconds to ensure everything is loaded
+                hideSkeleton('.stats');
+            }, 1000);
         });
         
         if ('serviceWorker' in navigator) {
