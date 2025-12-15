@@ -88,7 +88,7 @@ export default function HomePage() {
 
       {/* Banner Ad */}
       <div className="mb-8">
-        <AdSense adSlot="1234567890" style={{ display: 'block', textAlign: 'center', minHeight: '90px' }} />
+        <AdSense adSlot="7443849434" style={{ display: 'block', textAlign: 'center', minHeight: '90px' }} />
       </div>
 
       {/* Stats Section */}
