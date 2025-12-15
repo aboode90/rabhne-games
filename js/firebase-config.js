@@ -14,8 +14,10 @@ firebase.initializeApp(firebaseConfig);
 // Initialize services
 const auth = firebase.auth();
 const db = firebase.firestore();
+const functions = firebase.functions();
 window.auth = auth;
 window.db = db;
+window.functions = functions;
 
 // Enable Google Auth popup
 auth.useDeviceLanguage();
@@ -23,19 +25,19 @@ auth.useDeviceLanguage();
 // Enable Google Auth popup
 auth.useDeviceLanguage();
 
-// استخدام الإعدادات من الملف الجديد
+// إعدادات النظام المحسن v2.0
 const APP_CONFIG = window.APP_CONFIG || {
     POINTS: {
-        PER_CLAIM: 1,
-        COOLDOWN_SECONDS: 30,
-        DAILY_LIMIT: 2880,
-        MIN_WITHDRAW: 2000,
-        TO_DOLLAR_RATE: 10000,
-        MAX_PER_UPDATE: 5
+        PER_MINUTE: 1,              // نقطة واحدة كل دقيقة
+        DAILY_LIMIT: 2880,          // 48 ساعة × 60 دقيقة = 2880 نقطة يومياً
+        MIN_WITHDRAW_USDT: 2,       // 2 دولار كحد أدنى للسحب
+        TO_DOLLAR_RATE: 10000,      // 10,000 نقطة = 1 دولار
+        MAX_SESSION_MINUTES: 48     // حد أقصى 48 دقيقة لكل جلسة
     },
     SECURITY: {
-        SESSION_TIMEOUT: 3600000,
-        MAX_DAILY_SESSIONS: 100
+        SESSION_TIMEOUT: 300000,    // 5 دقائق عدم نشاط = إيقاف الجلسة
+        MAX_DAILY_SESSIONS: 60,     // حد أقصى 60 جلسة يومياً
+        HEARTBEAT_INTERVAL: 60000   // نبضة كل دقيقة
     },
     WITHDRAW_METHODS: ['USDT']
 };

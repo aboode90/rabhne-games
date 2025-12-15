@@ -2,16 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Users collection
+    // Users collection - SECURE: Only Cloud Functions can modify points
     match /users/{userId} {
-      // Users can read their own document
       allow read: if request.auth != null && request.auth.uid == userId;
-      
-      // Admin creation (via auth trigger mostly) or new user signup
       allow create: if request.auth != null && request.auth.uid == userId &&
-        // Validate required fields
         request.resource.data.keys().hasAll(['email', 'points', 'dailyPoints', 'isAdmin', 'blocked']) &&
-        // Ensure safe defaults
         request.resource.data.points == 0 &&
         request.resource.data.dailyPoints == 0 &&
         request.resource.data.isAdmin == false &&
@@ -22,33 +17,17 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
       
-      // SECURE UPDATE: Users can update their own doc BUT limits apply
+      // Users can only update profile info, NOT points (Cloud Functions only)
       allow update: if request.auth != null && request.auth.uid == userId &&
-        // 1. Cannot change isAdmin or blocked status
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'blocked']) &&
-        // 2. Cannot change email after creation
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['email']) &&
-        // 3. If points are changed, they must be an increment of max 5 (prevents hacking 1M points)
-        (
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points']) || 
-          (
-            request.resource.data.points >= resource.data.points &&
-            request.resource.data.points <= resource.data.points + 5
-          )
-        ) &&
-        // 4. Daily points logic: Allow increment OR reset (value <= 5)
-        (
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['dailyPoints']) ||
-          (
-            // Normal increment
-            (request.resource.data.dailyPoints >= resource.data.dailyPoints && request.resource.data.dailyPoints <= resource.data.dailyPoints + 5) ||
-            // Reset for new day (allow setting to small value)
-            request.resource.data.dailyPoints <= 5
-          )
-        ) &&
-        // 5. Validate data types
-        request.resource.data.points is number &&
-        request.resource.data.dailyPoints is number;
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points', 'dailyPoints', 'isAdmin', 'blocked']);
+    }
+    
+    // Game Sessions - Users can read their own, Cloud Functions manage
+    match /game_sessions/{sessionId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
     // Games collection

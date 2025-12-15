@@ -86,10 +86,10 @@
                     <div id="gameStatus" class="game-status inactive">⏸️ اللعب متوقف</div>
 
                     <div class="game-buttons">
-                        <button id="startGameBtn" class="btn btn-large btn-primary" onclick="startGame()">
-                            🎮 ابدأ اللعب (نقطة كل 30 ثانية)
+                        <button id="startGameBtn" class="btn btn-large btn-primary" onclick="startSecureGame()">
+                            🎮 ابدأ اللعب الآمن (نقطة كل دقيقة)
                         </button>
-                        <button id="stopGameBtn" class="btn btn-large btn-secondary" onclick="stopGame()"
+                        <button id="stopGameBtn" class="btn btn-large btn-secondary" onclick="stopSecureGame()"
                             style="display: none;">
                             ⏹️ إيقاف اللعب
                         </button>
@@ -145,9 +145,11 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-functions-compat.js"></script>
     <script src="js/firebase-config.js?v=2.2"></script>
     <script src="js/auth.js?v=2.2"></script>
     <script src="js/main.js?v=2.2"></script>
+    <script src="js/secure-game-session.js"></script>
     <script src="js/gamemonetize.js?v=2.2"></script>
     <script src="js/simple-game.js?v=2.2"></script>
     <script src="js/game.js?v=2.2"></script>
