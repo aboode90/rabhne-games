@@ -1,289 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جميع الألعاب - Rabhne v2.0</title>
-    <meta name="description" content="جميع ألعاب HTML5 المتاحة في منصة Rabhne - العب واربح نقاط">
-    <meta name="keywords" content="ألعاب HTML5, ألعاب مجانية, ألعاب عربية, كسب نقاط">
-    
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/theme.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="img/game.jpg" type="image/x-icon">
-    
-    <!-- AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
-    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-</head>
-
-<body data-theme="light" data-online="true">
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <span class="logo-icon">🎮</span>
-                    <span>Rabhne</span>
-                </a>
-                
-                <nav class="nav">
-                    <a href="/" class="nav-link">الرئيسية</a>
-                    <a href="games.html" class="nav-link active">الألعاب</a>
-                    <a href="earn.html" class="nav-link">💎 المهام</a>
-                    <a href="dashboard.html" class="nav-link" id="navDashboard" style="display: none;">لوحة التحكم</a>
-                </nav>
-                
-                <div class="user-menu">
-                    <div id="authButtons">
-                        <button class="btn btn-primary" onclick="loginWithGoogle()">🔑 تسجيل الدخول</button>
-                    </div>
-                    
-                    <div id="userMenu" style="display: none;">
-                        <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
-                        <span id="userName" class="text-secondary"></span>
-                        <button class="btn btn-secondary btn-sm" onclick="logout()">خروج</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1 class="hero-title">🎮 مجموعة الألعاب المتقدمة</h1>
-                <p class="hero-subtitle">اختر من مجموعة متنوعة من الألعاب المثيرة واربح نقاط حقيقية مع كل لعبة!</p>
-                <div class="stats">
-                    <div class="stat">
-                        <span class="stat-number" id="totalGamesCount">15+</span>
-                        <span class="stat-label">لعبة متاحة</span>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat">
-                        <span class="stat-number">1</span>
-                        <span class="stat-label">نقطة/دقيقة</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Games Filter -->
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">🎯 اختر فئة اللعبة</h2>
-                
-                <!-- Search -->
-                <div class="mb-6">
-                    <input type="text" id="searchInput" class="input" placeholder="🔍 ابحث عن لعبة..." onkeyup="searchGames()" style="max-width: 400px; margin: 0 auto; display: block;">
-                </div>
-                
-                <!-- Category Filters -->
-                <div class="flex gap-4 justify-center flex-wrap mb-8">
-                    <button class="btn btn-primary" data-category="" onclick="filterByCategory('')">
-                        <span>🎯</span>
-                        <span>جميع الألعاب</span>
-                    </button>
-                    <button class="btn btn-ghost" data-category="action" onclick="filterByCategory('action')">
-                        <span>⚔️</span>
-                        <span>أكشن</span>
-                    </button>
-                    <button class="btn btn-ghost" data-category="puzzle" onclick="filterByCategory('puzzle')">
-                        <span>🧩</span>
-                        <span>ألغاز</span>
-                    </button>
-                    <button class="btn btn-ghost" data-category="racing" onclick="filterByCategory('racing')">
-                        <span>🏎️</span>
-                        <span>سباق</span>
-                    </button>
-                    <button class="btn btn-ghost" data-category="sports" onclick="filterByCategory('sports')">
-                        <span>⚽</span>
-                        <span>رياضة</span>
-                    </button>
-                    <button class="btn btn-ghost" data-category="adventure" onclick="filterByCategory('adventure')">
-                        <span>🗺️</span>
-                        <span>مغامرة</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Games Grid -->
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">🎮 الألعاب المتاحة</h2>
-                
-                <div id="gamesGrid" class="grid grid-auto-fit">
-                    <!-- Games will be loaded here -->
-                </div>
-
-                <!-- Loading -->
-                <div id="loadingGames">
-                    <!-- Skeleton loading will be shown here -->
-                </div>
-
-                <!-- No Games Found -->
-                <div id="noGamesFound" class="hidden">
-                    <!-- Empty state will be shown here -->
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <span class="logo-icon">🎮</span>
-                        <span class="logo-text">Rabhne v2.0</span>
-                    </div>
-                    <p class="footer-description">منصة الألعاب العربية الرائدة لربح الأموال الحقيقية</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>روابط سريعة</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">🏠 الرئيسية</a></li>
-                        <li><a href="earn.html">💎 المهام</a></li>
-                        <li><a href="dashboard.html">📊 لوحة التحكم</a></li>
-                        <li><a href="withdraw.html">💰 السحب</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>الدعم</h4>
-                    <ul class="footer-links">
-                        <li><a href="support.html">📞 الدعم الفني</a></li>
-                        <li><a href="mailto:support@rabhne.online">✉️ البريد الإلكتروني</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>إحصائيات الألعاب</h4>
-                    <div class="footer-stats">
-                        <div class="footer-stat">
-                            <span class="stat-value">15+</span>
-                            <span class="stat-label">لعبة متاحة</span>
-                        </div>
-                        <div class="footer-stat">
-                            <span class="stat-value">500+</span>
-                            <span class="stat-label">لاعب نشط</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <div class="footer-copyright">
-                    <p>&copy; 2024 Rabhne Games. جميع الحقوق محفوظة.</p>
-                    <p class="footer-version">النظام المحسن v2.0 - تم التطوير ب❤️ في المملكة العربية السعودية</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-nav">
-        <div class="mobile-nav-content">
-            <a href="index.html" class="mobile-nav-item">
-                <span class="mobile-nav-icon">🏠</span>
-                <span class="mobile-nav-text">الرئيسية</span>
-            </a>
-            <a href="games.html" class="mobile-nav-item active">
-                <span class="mobile-nav-icon">🎮</span>
-                <span class="mobile-nav-text">الألعاب</span>
-            </a>
-            <a href="earn.html" class="mobile-nav-item">
-                <span class="mobile-nav-icon">💎</span>
-                <span class="mobile-nav-text">المهام</span>
-            </a>
-            <a href="dashboard.html" class="mobile-nav-item" id="mobileNavDashboard" style="display: none;">
-                <span class="mobile-nav-icon">📋</span>
-                <span class="mobile-nav-text">لوحتي</span>
-            </a>
-            <div class="mobile-nav-item" id="mobileAuthButton" onclick="loginWithGoogle()">
-                <span class="mobile-nav-icon">🔑</span>
-                <span class="mobile-nav-text">دخول</span>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
-    <script src="assets/js/ui.js"></script>
-    <script src="js/firebase-config.js?v=2.1"></script>
-    <script src="js/ui-states.js"></script>
-    <script src="js/auth.js?v=2.1"></script>
-    <script src="js/games.js?v=2.1"></script>
-    
-    <script>
-        // Initialize games page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Show skeleton loading for games
-            showSkeleton('#gamesGrid', 'card', 6);
-            
-            // Update filter buttons
-            const filterButtons = document.querySelectorAll('[data-category]');
-            filterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterButtons.forEach(b => b.className = 'btn btn-ghost');
-                    btn.className = 'btn btn-primary';
-                });
-            });
-        });
-        
-        // Override the original functions to use new UI
-        const originalFilterByCategory = window.filterByCategory;
-        window.filterByCategory = function(category) {
-            if (originalFilterByCategory) {
-                originalFilterByCategory(category);
-            }
-        };
-        
-        const originalSearchGames = window.searchGames;
-        window.searchGames = function() {
-            if (originalSearchGames) {
-                originalSearchGames();
-            }
-        };
-        
-        const originalClearSearch = window.clearSearch;
-        window.clearSearch = function() {
-            document.getElementById('searchInput').value = '';
-            if (originalClearSearch) {
-                originalClearSearch();
-            }
-        };
-    </script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
-    </script>
-    
-    <!-- AdCash -->
-    <script type="text/javascript">
-        aclib.runAutoTag({
-            zoneId: 'uvhasp50cf',
-        });
-    </script>
-</body>
-</html>

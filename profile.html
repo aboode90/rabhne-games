@@ -1,108 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الملف الشخصي - Rabhne</title>
-    <link rel="stylesheet" href="css/style.css?v=2.2">
-    <link rel="stylesheet" href="css/animations-light.css?v=2.2">
-    <link rel="stylesheet" href="css/mobile.css?v=2.2">
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269"
-        crossorigin="anonymous"></script>
-</head>
-
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">🎮 Rabhne</div>
-            <div class="nav-menu">
-                <a href="index.html" class="nav-link">الرئيسية</a>
-                <a href="games.html" class="nav-link">الألعاب</a>
-                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
-                <div id="userMenu">
-                    <span id="userName"></span>
-                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <div class="container">
-            <div class="dashboard-header">
-                <h1>👤 الملف الشخصي</h1>
-                <p>إدارة معلوماتك الشخصية</p>
-            </div>
-
-            <div class="withdraw-form">
-                <h2>معلومات الحساب</h2>
-                <form id="profileForm">
-                    <div class="form-group">
-                        <label for="displayName">الاسم:</label>
-                        <input type="text" id="displayName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">البريد الإلكتروني:</label>
-                        <input type="email" id="email" readonly style="background: #f5f5f5;">
-                        <small>لا يمكن تغيير البريد الإلكتروني</small>
-                    </div>
-                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
-                </form>
-            </div>
-
-            <div class="admin-card">
-                <h2>إحصائيات الحساب</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="userPoints">0</div>
-                        <div class="stat-label">إجمالي النقاط</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalEarned">0</div>
-                        <div class="stat-label">نقاط مكتسبة</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalWithdrawn">0</div>
-                        <div class="stat-label">نقاط مسحوبة</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="joinDate">-</div>
-                        <div class="stat-label">تاريخ الانضمام</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🏠</span>
-            <span class="mobile-nav-text">الرئيسية</span>
-        </a>
-        <a href="games.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🎮</span>
-            <span class="mobile-nav-text">الألعاب</span>
-        </a>
-        <a href="dashboard.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">📋</span>
-            <span class="mobile-nav-text">لوحتي</span>
-        </a>
-        <a href="profile.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">👤</span>
-            <span class="mobile-nav-text">الملف</span>
-        </a>
-    </div>
-
-    <script src="js/firebase-config.js?v=2.2"></script>
-    <script src="js/auth.js?v=2.2"></script>
-    <script src="js/main.js?v=2.2"></script>
-    <script src="js/pwa.js"></script>
-</body>
-
-</html>

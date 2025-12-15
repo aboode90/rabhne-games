@@ -1,184 +1,228 @@
-# 🚀 دليل النشر - النظام المحسن v2.0
+# 🚀 Rabhne Games - Deployment Guide
 
-## 📋 المتطلبات الأساسية
+## Prerequisites
 
-### 1. إعداد Firebase
+1. **Node.js 18+** installed
+2. **Firebase CLI** installed: `npm install -g firebase-tools`
+3. **Vercel CLI** installed: `npm install -g vercel`
+4. **Firebase Project** created
+5. **Domain** connected to Vercel (rabhne.online)
+
+## 🔧 Setup Instructions
+
+### 1. Install Dependencies
+
 ```bash
-npm install -g firebase-tools
-firebase login
-firebase init
-```
-
-### 2. إعداد Cloud Functions
-```bash
-cd functions
 npm install
+cd functions && npm install && cd ..
 ```
 
-### 3. نشر Cloud Functions
+### 2. Firebase Setup
+
+#### Create Firebase Project
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Create new project: `rabhne-games`
+3. Enable Authentication (Google + Email/Password)
+4. Enable Firestore Database
+5. Enable Cloud Functions
+
+#### Configure Environment Variables
+1. Copy `.env.example` to `.env.local`
+2. Fill in Firebase configuration from project settings
+3. Generate Firebase Admin SDK private key for server-side operations
+
 ```bash
+# Example .env.local
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyC...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=rabhne-games.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=rabhne-games
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=rabhne-games.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef
+
+FIREBASE_ADMIN_PROJECT_ID=rabhne-games
+FIREBASE_ADMIN_CLIENT_EMAIL=firebase-adminsdk-xxxxx@rabhne-games.iam.gserviceaccount.com
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_KEY_HERE\n-----END PRIVATE KEY-----\n"
+
+NEXT_PUBLIC_APP_URL=https://rabhne.online
+```
+
+#### Deploy Firestore Rules and Functions
+```bash
+# Login to Firebase
+firebase login
+
+# Initialize Firebase (if not done)
+firebase init
+
+# Deploy Firestore rules and indexes
+firebase deploy --only firestore
+
+# Deploy Cloud Functions
 firebase deploy --only functions
 ```
 
-### 4. تحديث قواعد Firestore
+### 3. Create Admin User
+
+#### Set Admin Custom Claims
 ```bash
-firebase deploy --only firestore:rules
+# Install Firebase Admin SDK globally for quick setup
+npm install -g firebase-admin
+
+# Create admin user script (run once)
+node -e "
+const admin = require('firebase-admin');
+const serviceAccount = require('./path-to-service-account-key.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+// Replace with your admin email
+const adminEmail = 'admin@rabhne.online';
+
+admin.auth().getUserByEmail(adminEmail)
+  .then(user => {
+    return admin.auth().setCustomUserClaims(user.uid, { admin: true });
+  })
+  .then(() => {
+    console.log('Admin claims set successfully');
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    process.exit(1);
+  });
+"
 ```
 
-### 5. نشر الموقع
+### 4. Vercel Deployment
+
+#### Connect Domain
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Import GitHub repository or deploy directly
+3. Add custom domain: `rabhne.online` and `www.rabhne.online`
+4. Configure environment variables in Vercel dashboard
+
+#### Deploy to Vercel
 ```bash
-firebase deploy --only hosting
+# Login to Vercel
+vercel login
+
+# Deploy
+vercel --prod
+
+# Or use GitHub integration for automatic deployments
 ```
 
-## 🔧 الإعدادات المطلوبة
+### 5. Domain Configuration
+
+#### DNS Settings (Hostinger)
+```
+Type: A
+Name: @
+Value: 76.76.19.61 (Vercel IP)
+
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+```
+
+#### Vercel Domain Settings
+1. Add both `rabhne.online` and `www.rabhne.online`
+2. Set `rabhne.online` as primary
+3. Enable automatic HTTPS
+
+## 🧪 Testing
+
+### Local Development
+```bash
+# Start Next.js development server
+npm run dev
+
+# Start Firebase emulators (optional)
+firebase emulators:start
+```
+
+### Production Testing
+1. Test authentication (Google + Email)
+2. Test game loading and session tracking
+3. Test withdraw request flow
+4. Test admin panel functionality
+5. Test PWA installation
+6. Test mobile responsiveness
+
+## 📊 Monitoring
 
 ### Firebase Console
-1. **Authentication**: تفعيل Google Sign-in
-2. **Firestore**: إنشاء قاعدة البيانات
-3. **Functions**: تفعيل Blaze Plan (مطلوب للـ Cloud Functions)
+- Monitor authentication users
+- Check Firestore usage
+- Monitor Cloud Functions logs
+- Review security rules
 
-### قواعد Firestore الجديدة
-- تم تحديث القواعد لمنع التلاعب في النقاط من الواجهة الأمامية
-- فقط Cloud Functions يمكنها تعديل النقاط
-- حماية شاملة من التلاعب
+### Vercel Dashboard
+- Monitor deployment status
+- Check performance metrics
+- Review function logs
+- Monitor bandwidth usage
 
-## 🛡️ ميزات الأمان الجديدة
+## 🔒 Security Checklist
 
-### 1. نظام الجلسات الآمن
-- **Server-side validation**: حساب النقاط في الخادم فقط
-- **Heartbeat system**: نبضات كل دقيقة للتحقق من النشاط
-- **Session limits**: حد أقصى 48 دقيقة لكل جلسة
-- **Anti-cheat**: كشف محاولات التلاعب
+- [ ] Firestore security rules deployed
+- [ ] Environment variables secured
+- [ ] Admin custom claims configured
+- [ ] HTTPS enabled on domain
+- [ ] CSP headers configured
+- [ ] Rate limiting implemented (Phase 2)
 
-### 2. نظام السحب المحسن
-- **Atomic transactions**: معاملات ذرية لمنع الأخطاء
-- **Minimum withdrawal**: رفع الحد الأدنى إلى 2 دولار
-- **Secure validation**: التحقق من صحة البيانات server-side
+## 🚀 Go Live Checklist
 
-### 3. حماية من التلاعب
-- **Rate limiting**: حدود على عدد الطلبات
-- **Session monitoring**: مراقبة الجلسات المشبوهة
-- **Device fingerprinting**: تتبع الأجهزة (اختياري)
+- [ ] Firebase project configured
+- [ ] Cloud Functions deployed
+- [ ] Firestore rules and indexes deployed
+- [ ] Admin user created with custom claims
+- [ ] Environment variables configured
+- [ ] Domain connected to Vercel
+- [ ] SSL certificate active
+- [ ] PWA manifest working
+- [ ] Mobile responsiveness tested
+- [ ] All authentication methods working
+- [ ] Withdraw flow tested
+- [ ] Admin panel accessible
 
-## 📊 هيكل البيانات الجديد
+## 📞 Support
 
-### Users Collection
-```javascript
-{
-  uid: "user_id",
-  email: "user@example.com",
-  displayName: "اسم المستخدم",
-  points: 0,
-  dailyPoints: 0,
-  lastDailyResetAt: timestamp,
-  isAdmin: false,
-  blocked: false,
-  createdAt: timestamp,
-  lastLoginAt: timestamp
-}
+For deployment issues:
+- Check Firebase Console logs
+- Check Vercel deployment logs
+- Review environment variables
+- Test locally first
+
+## 🔄 Updates
+
+### Code Updates
+```bash
+# Pull latest changes
+git pull origin main
+
+# Deploy to Vercel (automatic with GitHub integration)
+vercel --prod
+
+# Update Cloud Functions if needed
+firebase deploy --only functions
 ```
 
-### Game Sessions Collection
-```javascript
-{
-  sessionId: "session_id",
-  uid: "user_id",
-  gameId: "game_id",
-  startedAt: timestamp,
-  endedAt: timestamp,
-  status: "open|approved|rejected",
-  heartbeats: 0,
-  serverApprovedMinutes: 0,
-  pointsAwarded: 0,
-  riskScore: 0
-}
+### Database Updates
+```bash
+# Deploy new Firestore rules
+firebase deploy --only firestore:rules
+
+# Deploy new indexes
+firebase deploy --only firestore:indexes
 ```
-
-### Withdraw Requests Collection
-```javascript
-{
-  requestId: "request_id",
-  uid: "user_id",
-  amountUSDT: 2.5,
-  pointsCost: 25000,
-  walletTRC20: "TRC20_ADDRESS",
-  status: "pending|approved|rejected|paid",
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### Transactions Collection
-```javascript
-{
-  transactionId: "tx_id",
-  uid: "user_id",
-  type: "earn|withdraw_lock|withdraw_release|admin_adjust",
-  pointsDelta: 10,
-  meta: { sessionId: "...", gameId: "..." },
-  createdAt: timestamp
-}
-```
-
-## 🔄 Cloud Functions
-
-### 1. startGameSession
-- بدء جلسة لعب آمنة
-- التحقق من الجلسات النشطة
-- إنشاء session record
-
-### 2. sessionHeartbeat
-- نبضة كل دقيقة
-- حساب النقاط المستحقة
-- مراقبة النشاط
-
-### 3. submitGameSession
-- إنهاء الجلسة وحساب النقاط
-- تحديث رصيد المستخدم
-- إضافة سجل المعاملة
-
-### 4. requestWithdraw
-- طلب سحب آمن
-- خصم النقاط atomically
-- إنشاء طلب السحب
-
-## 📱 تحسينات UX
-
-### 1. الصفحات الجديدة
-- `login.html`: صفحة تسجيل دخول مخصصة
-- `terms.html`: الشروط والأحكام
-- `privacy.html`: سياسة الخصوصية
-
-### 2. النظام المحسن
-- إشعارات في الوقت الفعلي
-- واجهة مستخدم محسنة
-- تجربة موبايل أفضل
-
-## 🚨 تحذيرات مهمة
-
-### 1. النشر
-- تأكد من نشر Cloud Functions قبل الموقع
-- اختبر جميع الوظائف في بيئة التطوير أولاً
-- راجع قواعد Firestore قبل النشر
-
-### 2. الأمان
-- لا تعرض مفاتيح API الحساسة
-- استخدم HTTPS فقط
-- راقب الأنشطة المشبوهة
-
-### 3. الأداء
-- راقب استهلاك Cloud Functions
-- ضع حدود على الطلبات
-- استخدم التخزين المؤقت عند الإمكان
-
-## 📞 الدعم الفني
-
-للمساعدة في النشر أو حل المشاكل:
-- البريد الإلكتروني: support@rabhne.online
-- الموقع: www.rabhne.online
 
 ---
 
-**تم تطوير هذا النظام بـ ❤️ في المملكة العربية السعودية**
+**🎮 Rabhne Games is now live at https://rabhne.online**
 
-© 2024 Rabhne Games. جميع الحقوق محفوظة.
+Built with ❤️ for the Arabic gaming community.

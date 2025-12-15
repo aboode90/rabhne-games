@@ -1,178 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الإدارة - Rabhne</title>
-    <meta name="description" content="لوحة إدارة منصة Rabhne - إدارة المستخدمين والألعاب والطلبات">
-    <meta name="keywords" content="إدارة, لوحة تحكم, مستخدمين, ألعاب">
-    <link rel="stylesheet" href="css/style.css?v=2.2">
-    <link rel="stylesheet" href="css/mobile.css?v=2.2">
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="img/game.jpg" type="image/x-icon">
-    
-    <!-- AdSense Code -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
-    
-    <!-- AdCash Library -->
-    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-</head>
-
-<body>
-    <nav class="navbar admin-nav">
-        <div class="nav-container">
-            <div class="nav-logo">👮‍♂️ Admin Panel</div>
-            <div class="nav-menu">
-                <a href="index.html" class="nav-link">العودة للموقع</a>
-                <span id="adminName" style="color: white; margin-right: 20px;"></span>
-                <button class="btn btn-secondary btn-small" onclick="logout()">خروج</button>
-            </div>
-        </div>
-    </nav>
-
-    <main class="main-content admin-content">
-        <div class="container">
-            <!-- Stats Overview -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="statsPending">0</div>
-                    <div class="stat-label">طلبات معلقة</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statsPaid">$0</div>
-                    <div class="stat-label">إجمالي المدفوعات</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statsUsers">0</div>
-                    <div class="stat-label">إجمالي المستخدمين</div>
-                </div>
-            </div>
-
-            <!-- Withdraw Requests -->
-            <div class="admin-card">
-                <h2>💰 طلبات السحب المعلقة</h2>
-                <div style="overflow-x: auto;">
-                    <table class="withdrawals-table">
-                        <thead>
-                            <tr>
-                                <th>المستخدم</th>
-                                <th>المبلغ (Points)</th>
-                                <th>المبلغ ($)</th>
-                                <th>المحفظة (USDT)</th>
-                                <th>التاريخ</th>
-                                <th>إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="withdrawalsTableBody">
-                            <tr>
-                                <td colspan="6" style="text-align:center">جاري التحميل...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <script src="js/firebase-config.js?v=2.2"></script>
-    <script src="js/auth.js?v=2.2"></script>
-    <script src="js/admin.js?v=2.2"></script>
-    
-    <!-- Video.js and Contrib Ads -->
-    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/6.9.0/videojs-contrib-ads.min.js"></script>
-    
-    <!-- AdCash AutoTag Code -->
-    <script type="text/javascript">
-        aclib.runAutoTag({
-            zoneId: 'uvhasp50cf',
-        });
-    </script>
-    
-    <!-- Admin utility functions -->
-    <script>
-        // Format date/time helper function
-        function formatTime(timestamp) {
-            if (!timestamp) return 'غير محدد';
-            
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return date.toLocaleString('ar-SA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        // Show message helper function
-        function showMessage(message, type = 'info') {
-            // Create message element if it doesn't exist
-            let messageEl = document.getElementById('admin-message');
-            if (!messageEl) {
-                messageEl = document.createElement('div');
-                messageEl.id = 'admin-message';
-                messageEl.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 15px 20px;
-                    border-radius: 5px;
-                    color: white;
-                    font-weight: bold;
-                    z-index: 10000;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-                    max-width: 300px;
-                `;
-                document.body.appendChild(messageEl);
-            }
-            
-            // Set message content and style
-            messageEl.textContent = message;
-            
-            // Set color based on type
-            switch(type) {
-                case 'success':
-                    messageEl.style.backgroundColor = '#4CAF50';
-                    break;
-                case 'error':
-                    messageEl.style.backgroundColor = '#f44336';
-                    break;
-                case 'warning':
-                    messageEl.style.backgroundColor = '#ff9800';
-                    break;
-                default:
-                    messageEl.style.backgroundColor = '#2196F3';
-            }
-            
-            // Show message
-            messageEl.style.display = 'block';
-            
-            // Hide after 3 seconds
-            setTimeout(() => {
-                messageEl.style.display = 'none';
-            }, 3000);
-        }
-
-        // Logout function
-        function logout() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                firebase.auth().signOut().then(() => {
-                    window.location.href = 'index.html';
-                }).catch((error) => {
-                    console.error('Error signing out:', error);
-                    showMessage('حدث خطأ أثناء تسجيل الخروج', 'error');
-                });
-            }
-        }
-    </script>
-</body>
-
-</html>

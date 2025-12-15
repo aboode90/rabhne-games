@@ -1,288 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سحب الأرباح - Rabhne v2.0</title>
-    <meta name="description" content="سحب أرباحك من منصة Rabhne - حول نقاطك إلى أموال حقيقية">
-    <meta name="keywords" content="سحب, أرباح, نقاط, USDT, محفظة">
-    
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/theme.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="img/game.jpg" type="image/x-icon">
-    
-    <!-- AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
-</head>
-
-<body data-theme="light" data-online="true">
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <span class="logo-icon">🎮</span>
-                    <span>Rabhne</span>
-                </a>
-                
-                <nav class="nav">
-                    <a href="/" class="nav-link">الرئيسية</a>
-                    <a href="games.html" class="nav-link">الألعاب</a>
-                    <a href="earn.html" class="nav-link">💎 المهام</a>
-                    <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
-                    <a href="withdraw.html" class="nav-link active">💰 السحب</a>
-                </nav>
-                
-                <div class="user-menu">
-                    <div id="userMenu">
-                        <div class="user-points">💰 <span id="userPointsNav">0</span> نقطة</div>
-                        <span id="userName" class="text-secondary"></span>
-                        <button class="btn btn-secondary btn-sm" onclick="logout()">خروج</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Withdraw Hero -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1 class="hero-title">💰 سحب الأرباح</h1>
-                <p class="hero-subtitle">حول نقاطك إلى أموال حقيقية بسهولة وأمان تام</p>
-            </div>
-        </section>
-
-        <!-- Stats Section -->
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">📊 إحصائيات حسابك</h2>
-                <div id="statsGrid" class="grid grid-cols-4">
-                    <div class="card text-center hover:translate-y-1">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">💎</div>
-                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;" id="userPoints">0</div>
-                        <div class="text-secondary">نقاطك الحالية</div>
-                    </div>
-                    <div class="card text-center hover:translate-y-1">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">💵</div>
-                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;" id="cashValue">$0.00</div>
-                        <div class="text-secondary">القيمة النقدية</div>
-                    </div>
-                    <div class="card text-center hover:translate-y-1">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
-                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;">2,000</div>
-                        <div class="text-secondary">الحد الأدنى للسحب</div>
-                    </div>
-                    <div class="card text-center hover:translate-y-1">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔄</div>
-                        <div class="text-accent font-bold" style="font-size: 2rem; margin-bottom: 0.5rem;">10,000:1$</div>
-                        <div class="text-secondary">معدل التحويل</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Withdraw Form Section -->
-        <section class="section">
-            <div class="container">
-                <div class="card" style="max-width: 600px; margin: 0 auto;">
-                    <div class="text-center mb-6">
-                        <h2 class="mb-2">🚀 إنشاء طلب سحب جديد</h2>
-                        <p class="text-secondary">املأ البيانات أدناه لإنشاء طلب سحب آمن</p>
-                    </div>
-
-                    <div class="card card-glass mb-6">
-                        <div style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">ℹ️</div>
-                        <h4 class="mb-4 text-center">معلومات مهمة</h4>
-                        <ul class="text-secondary" style="list-style: none; padding: 0;">
-                            <li class="mb-2">• الحد الأدنى للسحب: 2,000 نقطة</li>
-                            <li class="mb-2">• سعر التحويل: 10,000 نقطة = 1$</li>
-                            <li class="mb-2">• يتم مراجعة الطلبات خلال 24 ساعة</li>
-                            <li>• لا يمكن إلغاء الطلب بعد الإرسال</li>
-                        </ul>
-                    </div>
-
-                    <form id="withdrawForm">
-                        <div class="form-group">
-                            <label class="form-label" for="withdrawAmount">💰 المبلغ بالدولار (USDT)</label>
-                            <div style="position: relative;">
-                                <input type="number" id="withdrawAmount" class="input" min="2" step="0.1" placeholder="أدخل المبلغ بالدولار" required>
-                                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: var(--font-size-sm);">USDT</span>
-                            </div>
-                            <div class="card p-4 mt-2 text-center" style="background: var(--success); color: var(--text-primary);">
-                                النقاط المطلوبة: <span class="font-bold" id="requiredPoints">0</span> نقطة
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="walletAddress">🏦 عنوان محفظة TRC20</label>
-                            <input type="text" id="walletAddress" class="input" placeholder="أدخل عنوان محفظة USDT (TRC20)" required>
-                            <small class="text-muted" style="font-size: var(--font-size-sm); margin-top: var(--space-2); display: block;">تأكد من صحة العنوان - لا يمكن استرداد الأموال المرسلة لعنوان خاطئ</small>
-                        </div>
-
-                        <button type="button" class="btn btn-lg btn-primary w-full animate-pulse" id="submitWithdrawBtn" onclick="requestSecureWithdraw()">
-                            🚀 إرسال طلب السحب الآمن
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Withdraw History Section -->
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">📋 تاريخ طلبات السحب</h2>
-                <div class="card">
-                    <div id="withdrawHistoryList">
-                        <!-- Loading will be shown here -->
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <span class="logo-icon">🎮</span>
-                        <span class="logo-text">Rabhne v2.0</span>
-                    </div>
-                    <p class="footer-description">سحب آمن وسريع لأرباحك من منصة الألعاب الرائدة</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>روابط سريعة</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">🏠 الرئيسية</a></li>
-                        <li><a href="games.html">🎮 الألعاب</a></li>
-                        <li><a href="dashboard.html">📊 لوحة التحكم</a></li>
-                        <li><a href="earn.html">💎 المهام</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>الدعم</h4>
-                    <ul class="footer-links">
-                        <li><a href="support.html">📞 الدعم الفني</a></li>
-                        <li><a href="mailto:support@rabhne.online">✉️ البريد الإلكتروني</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>معلومات السحب</h4>
-                    <div class="footer-stats">
-                        <div class="footer-stat">
-                            <span class="stat-value">24h</span>
-                            <span class="stat-label">وقت المعالجة</span>
-                        </div>
-                        <div class="footer-stat">
-                            <span class="stat-value">2K</span>
-                            <span class="stat-label">حد أدنى</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <div class="footer-copyright">
-                    <p>&copy; 2024 Rabhne Games. جميع الحقوق محفوظة.</p>
-                    <p class="footer-version">النظام المحسن v2.0 - تم التطوير بـ❤️ في المملكة العربية السعودية</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-nav">
-        <div class="mobile-nav-content">
-            <a href="index.html" class="mobile-nav-item">
-                <span class="mobile-nav-icon">🏠</span>
-                <span class="mobile-nav-text">الرئيسية</span>
-            </a>
-            <a href="games.html" class="mobile-nav-item">
-                <span class="mobile-nav-icon">🎮</span>
-                <span class="mobile-nav-text">الألعاب</span>
-            </a>
-            <a href="earn.html" class="mobile-nav-item">
-                <span class="mobile-nav-icon">💎</span>
-                <span class="mobile-nav-text">المهام</span>
-            </a>
-            <a href="dashboard.html" class="mobile-nav-item">
-                <span class="mobile-nav-icon">📋</span>
-                <span class="mobile-nav-text">لوحتي</span>
-            </a>
-            <a href="withdraw.html" class="mobile-nav-item active">
-                <span class="mobile-nav-icon">💰</span>
-                <span class="mobile-nav-text">سحب</span>
-            </a>
-        </div>
-    </nav>
-
-    <!-- Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
-    
-    <script src="assets/js/ui.js"></script>
-    <script src="js/firebase-config.js?v=2.1"></script>
-    <script src="js/ui-states.js"></script>
-    <script src="js/auth.js?v=2.1"></script>
-    <script src="js/main.js?v=2.1"></script>
-    <script src="js/secure-withdraw.js"></script>
-    <script src="js/withdraw.js?v=2.1"></script>
-    
-    <script>
-        // Initialize withdraw page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Show skeleton loading for stats
-            showSkeleton('#statsGrid', 'stats', 4);
-            
-            // Show loading for history
-            showLoading('#withdrawHistoryList', 'جاري تحميل تاريخ السحب...');
-            
-            // Calculate required points when amount changes
-            const amountInput = document.getElementById('withdrawAmount');
-            const requiredPointsSpan = document.getElementById('requiredPoints');
-            
-            amountInput.addEventListener('input', () => {
-                const amount = parseFloat(amountInput.value) || 0;
-                const requiredPoints = amount * 10000;
-                requiredPointsSpan.textContent = UI.formatNumber(requiredPoints);
-            });
-            
-            // Hide skeleton after data loads (simulate)
-            setTimeout(() => {
-                hideSkeleton('#statsGrid');
-            }, 1500);
-        });
-    </script>
-    
-    <script>
-        // Auth guard
-        if (!requireAuth()) {
-            window.location.href = '/';
-        }
-        
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
-    </script>
-</body>
-
-</html>

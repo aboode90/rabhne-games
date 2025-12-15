@@ -1,223 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اربح نقاط - Rabhne</title>
-    <meta name="description" content="احصل على نقاط من خلال إكمال المهام والعروض في منصة Rabhne">
-    <meta name="keywords" content="كسب نقاط, عروض, مهام, نقاط مجانية">
-    <link rel="stylesheet" href="css/style.css?v=2.2">
-    <link rel="stylesheet" href="css/mobile.css?v=2.2">
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="img/game.jpg" type="image/x-icon">
-    
-    <!-- AdSense Code -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269" crossorigin="anonymous"></script>
-    
-    <!-- AdCash Library -->
-    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-</head>
-
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">🎮 Rabhne</div>
-            <div class="nav-menu">
-                <a href="index.html" class="nav-link">الرئيسية</a>
-                <a href="games.html" class="nav-link">الألعاب</a>
-                <a href="earn.html" class="nav-link active">العروض</a>
-                <a href="dashboard.html" class="nav-link">لوحة التحكم</a>
-                <div id="userMenu">
-                    <span id="userName"></span>
-                    <button class="btn btn-secondary" onclick="logout()">خروج</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="main-content" style="padding: 20px 0;">
-        <div class="container">
-            <div class="dashboard-header">
-                <h1>💎 حائط العروض والمهام</h1>
-                <p>أكمل المهام واحصل على آلاف النقاط!</p>
-            </div>
-
-            <!-- Network Selector -->
-            <div class="network-selector">
-                <button class="network-btn active" onclick="switchNetwork('mylead')">MyLead</button>
-                <button class="network-btn" onclick="switchNetwork('cpalead')">CPALead</button>
-            </div>
-
-            <!-- MyLead Content -->
-            <div id="mylead-content" class="network-content active">
-                <div id="wallContainer">
-                    <div class="loading-wall">جاري تجهيز العروض لك...</div>
-                </div>
-            </div>
-
-            <!-- CPALead Content -->
-            <div id="cpalead-content" class="network-content">
-                <div id="cpaleadContainer">
-                    <div class="loading-wall">جاري تجهيز عروض CPALead...</div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">🏠</span>
-            <span class="mobile-nav-text">الرئيسية</span>
-        </a>
-        <a href="earn.html" class="mobile-nav-item active">
-            <span class="mobile-nav-icon">💎</span>
-            <span class="mobile-nav-text">اربح</span>
-        </a>
-        <a href="dashboard.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">📋</span>
-            <span class="mobile-nav-text">لوحتي</span>
-        </a>
-        <a href="support.html" class="mobile-nav-item">
-            <span class="mobile-nav-icon">💬</span>
-            <span class="mobile-nav-text">الدعم</span>
-        </a>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-config.js?v=2.2"></script>
-    <script src="js/auth.js?v=2.2"></script>
-    <script>
-        const OFFERWALL_URL = "https://reward-me.eu/68bbf3ce-d8bc-11f0-8770-c2a106037d45";
-
-        // Network switching function
-        function switchNetwork(network) {
-            // Update button states
-            document.querySelectorAll('.network-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Show selected content
-            document.querySelectorAll('.network-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`${network}-content`).classList.add('active');
-
-            // Load content if user is authenticated
-            if (currentUser) {
-                if (network === 'mylead') {
-                    loadMyLeadWall();
-                } else if (network === 'cpalead') {
-                    loadCPALeadWall();
-                }
-            }
-        }
-
-        function loadMyLeadWall() {
-            if (currentUser) {
-                const wallUrl = `${OFFERWALL_URL}?player_id=${currentUser.uid}`;
-                document.getElementById('wallContainer').innerHTML = `
-                    <iframe src="${wallUrl}" 
-                            class="iframe-container"
-                            sandbox="allow-top-navigation allow-scripts allow-same-origin allow-popups allow-forms"
-                            allow="clipboard-write">
-                    </iframe>
-                    <div class="alert alert-info" style="text-align: right; margin-top: 10px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 5px;">
-                        <strong>⚠️ ملاحظة هامة:</strong><br>
-                        النقاط المكتسبة من العروض لا تضاف فوراً.<br>
-                        يتم مراجعة العروض وإضافة النقاط <strong>يدوياً خلال 24 - 48 ساعة</strong>.<br>
-                        يرجى عدم فتح تذكرة قبل مرور هذه المدة.
-                    </div>
-                `;
-            }
-        }
-
-        function loadCPALeadWall() {
-            if (currentUser) {
-                // Publisher ID من حسابك في CPALead
-                const publisherId = '3323222'; // هذا هو المعرف الخاص بك
-                const userId = currentUser.uid;
-                
-                // عرض زر لفتح العروض في نافذة جديدة
-                document.getElementById('cpaleadContainer').innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <h3>🔗 CPALead عروض</h3>
-                        <p>اضغط على الزر أدناه لفتح عروض CPALead</p>
-                        <button class="btn btn-primary" onclick="openCPALeadOffers()" style="margin: 20px 0; padding: 15px 30px; font-size: 18px;">
-                            فتح عروض CPALead
-                        </button>
-                        <div style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #f8f9fa; margin-top: 20px;">
-                            <iframe 
-                                src="https://www.cpalead.com/mobile/index.php?pub_id=${publisherId}&sub_id=${userId}" 
-                                style="width: 100%; height: 100%; border: none; display: none;"
-                                frameborder="0"
-                                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"
-                                loading="lazy">
-                            </iframe>
-                            <div style="padding: 20px; color: #666;">
-                                <p>سيتم عرض العروض هنا بعد النقر على الزر أعلاه</p>
-                            </div>
-                        </div>
-                        <div class="alert alert-info" style="text-align: right; margin-top: 20px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 5px;">
-                            <strong>⚠️ ملاحظة هامة:</strong><br>
-                            يجب إكمال العروض مباشرة لضمان احتساب النقاط.<br>
-                            سيتم احتساب النقاط تلقائياً بعد إكمال العروض.
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function openCPALeadOffers() {
-            const publisherId = '3323222';
-            const userId = currentUser.uid;
-            const cpaleadUrl = `https://www.cpalead.com/mobile/index.php?pub_id=${publisherId}&sub_id=${userId}`;
-            window.open(cpaleadUrl, '_blank');
-        }
-
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('userName').textContent = user.displayName || user.email;
-                
-                // Load default network (MyLead)
-                loadMyLeadWall();
-            } else {
-                // User not logged in
-                document.getElementById('wallContainer').innerHTML = `
-                    <div style="text-align: center; padding: 40px; background: white; border-radius: 10px;">
-                        <h3>🔒 يجب عليك تسجيل الدخول أولاً</h3>
-                        <p>لرؤية العروض وكسب النقاط، يرجى تسجيل الدخول.</p>
-                        <button class="btn btn-primary" onclick="loginWithGoogle()">تسجيل الدخول</button>
-                    </div>
-                `;
-                
-                document.getElementById('cpaleadContainer').innerHTML = `
-                    <div style="text-align: center; padding: 40px; background: white; border-radius: 10px;">
-                        <h3>🔒 يجب عليك تسجيل الدخول أولاً</h3>
-                        <p>لرؤية عروض CPALead وكسب النقاط، يرجى تسجيل الدخول.</p>
-                        <button class="btn btn-primary" onclick="loginWithGoogle()">تسجيل الدخول</button>
-                    </div>
-                `;
-            }
-        });
-    </script>
-    
-    <!-- Video.js and Contrib Ads -->
-    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/6.9.0/videojs-contrib-ads.min.js"></script>
-    
-    <!-- AdCash AutoTag Code -->
-    <script type="text/javascript">
-        aclib.runAutoTag({
-            zoneId: 'uvhasp50cf',
-        });
-    </script>
-</body>
-
-</html>

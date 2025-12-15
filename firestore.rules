@@ -1,104 +1,72 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Users collection - SECURE: Only Cloud Functions can modify points
+    // Users collection
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId &&
-        request.resource.data.keys().hasAll(['email', 'points', 'dailyPoints', 'isAdmin', 'blocked']) &&
-        request.resource.data.points == 0 &&
-        request.resource.data.dailyPoints == 0 &&
-        request.resource.data.isAdmin == false &&
-        request.resource.data.blocked == false;
+      // Users can read and write their own document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
       
-      // Admins can read and write all
-      allow read, write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
-      
-      // Users can only update profile info, NOT points (Cloud Functions only)
-      allow update: if request.auth != null && request.auth.uid == userId &&
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['points', 'dailyPoints', 'isAdmin', 'blocked']);
-    }
-    
-    // Game Sessions - Users can read their own, Cloud Functions manage
-    match /game_sessions/{sessionId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      // Admins can read all user documents
       allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      
+      // Prevent users from directly modifying points
+      allow update: if request.auth != null && 
+        request.auth.uid == userId &&
+        !('points' in request.resource.data.diff(resource.data));
     }
     
     // Games collection
     match /games/{gameId} {
-      // Anyone can read active games
-      allow read: if resource.data.active == true;
+      // Anyone can read games
+      allow read: if true;
       
-      // Only admins can create/update/delete games
+      // Only admins can write games
       allow write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
-      
-      // Allow incrementing play count by 1
-      allow update: if request.auth != null &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['plays']) &&
-        request.resource.data.plays == resource.data.plays + 1 &&
-        request.resource.data.plays is number;
-    }
-    
-    // Withdraw requests collection
-    match /withdraw_requests/{requestId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
-      allow create: if request.auth != null && 
-        request.auth.uid == request.resource.data.uid &&
-        request.resource.data.status == 'pending' &&
-        request.resource.data.uid is string &&
-        request.resource.data.amountPoints is number &&
-        request.resource.data.amountCash is number &&
-        request.resource.data.method is string &&
-        request.resource.data.account is string;
-      allow update: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
-      allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
     // Transactions collection
     match /transactions/{transactionId} {
-      // Users can read their own transactions
-      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      // Users can only read their own transactions
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
       
-      // Allow users to create their own transaction logs with validation
-      allow create: if request.auth != null && 
-        request.resource.data.uid == request.auth.uid &&
-        // Validate required fields
-        request.resource.data.keys().hasAll(['uid', 'type', 'pointsDelta']) &&
-        // Validate data types
-        request.resource.data.uid is string &&
-        request.resource.data.type is string &&
-        request.resource.data.pointsDelta is number &&
-        // Limit point delta to prevent abuse
-        request.resource.data.pointsDelta >= -10000 &&
-        request.resource.data.pointsDelta <= 5;
+      // Only system (Cloud Functions) can create transactions
+      allow create: if false;
       
-      // Admins can read all transactions (for dashboard)
+      // Admins can read all transactions
       allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Withdraw requests collection
+    match /withdraw_requests/{requestId} {
+      // Users can read their own withdraw requests
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      
+      // Users can create their own withdraw requests (via Cloud Function only)
+      allow create: if false;
+      
+      // Admins can read and update all withdraw requests
+      allow read, update: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Game sessions collection
+    match /game_sessions/{sessionId} {
+      // Users can read and write their own sessions
+      allow read, write: if request.auth != null && resource.data.uid == request.auth.uid;
+      
+      // Admins can read all sessions
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Admin settings collection
+    match /admin_settings/{settingId} {
+      // Only admins can read and write settings
+      allow read, write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
   }
-    
-    // Support Tickets
-    match /tickets/{ticketId} {
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
-      allow update: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
-      
-      match /messages/{messageId} {
-        allow read, write: if request.auth != null; // Simplified, rely on parent ticket access logic in app or add strict checks if needed
-      }
-    }
-  }
+}

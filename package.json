@@ -1,12 +1,40 @@
 {
   "name": "rabhne-games",
   "version": "2.0.0",
-  "description": "منصة ألعاب HTML5 عربية احترافية",
-  "main": "index.html",
+  "private": true,
   "scripts": {
-    "build": "echo 'Build complete'"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
   },
-  "keywords": ["games", "html5", "arabic", "points"],
-  "author": "Rabhne Team",
-  "license": "MIT"
+  "dependencies": {
+    "next": "^14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "firebase": "^10.7.1",
+    "firebase-admin": "^12.0.0",
+    "@tanstack/react-query": "^5.14.2",
+    "react-hook-form": "^7.48.2",
+    "@hookform/resolvers": "^3.3.2",
+    "zod": "^3.22.4",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.294.0",
+    "react-hot-toast": "^2.4.1",
+    "framer-motion": "^10.16.16",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.0.4",
+    "@tailwindcss/forms": "^0.5.7"
+  }
 }
