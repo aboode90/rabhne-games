@@ -6,6 +6,7 @@ import { MainLayout } from '@/components/layout/main-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { AdSense } from '@/components/ads/adsense'
 import { useAuth } from '@/components/auth/auth-provider'
 import { ROUTES, APP_CONFIG } from '@/lib/config'
 import {
@@ -299,6 +300,15 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Multiplex Ad */}
+        <div className="mt-12">
+          <AdSense 
+            adSlot="7982264856" 
+            adFormat="autorelaxed"
+            style={{ display: 'block', minHeight: '200px' }}
+          />
         </div>
       </div>
     </MainLayout>
