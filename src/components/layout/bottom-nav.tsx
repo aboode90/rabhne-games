@@ -14,7 +14,7 @@ import {
 
 const bottomNavigation = [
   { name: 'الألعاب', href: ROUTES.GAMES, icon: Gamepad2 },
-  { name: 'الربح', href: ROUTES.GAMES, icon: Coins }, // Same as games for now
+  { name: 'عروض الربح', href: ROUTES.OFFERS, icon: Coins },
   { name: 'لوحة التحكم', href: ROUTES.DASHBOARD, icon: BarChart3, requireAuth: true },
   { name: 'الملف الشخصي', href: ROUTES.PROFILE, icon: User, requireAuth: true },
 ]

@@ -42,6 +42,7 @@ export const ROUTES = {
   HOME: '/',
   GAMES: '/games',
   GAME: '/game',
+  OFFERS: '/offers',
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   WITHDRAW: '/withdraw',

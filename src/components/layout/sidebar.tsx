@@ -21,6 +21,7 @@ import {
 const navigation = [
   { name: 'الرئيسية', href: ROUTES.HOME, icon: Home },
   { name: 'الألعاب', href: ROUTES.GAMES, icon: Gamepad2 },
+  { name: 'عروض الربح', href: ROUTES.OFFERS, icon: DollarSign },
   { name: 'لوحة التحكم', href: ROUTES.DASHBOARD, icon: BarChart3, requireAuth: true },
   { name: 'السحب', href: ROUTES.WITHDRAW, icon: CreditCard, requireAuth: true },
   { name: 'الملف الشخصي', href: ROUTES.PROFILE, icon: User, requireAuth: true },
