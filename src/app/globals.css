@@ -26,8 +26,8 @@ body {
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 15, 23, 42;
-  --background-end-rgb: 30, 41, 59;
+  --background-start-rgb: 2, 6, 23;
+  --background-end-rgb: 15, 23, 42;
 }
 
 /* Custom scrollbar */
