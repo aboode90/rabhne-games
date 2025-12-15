@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
   images: {
     domains: ['firebasestorage.googleapis.com', 'img.gamemonetize.com'],
     unoptimized: true

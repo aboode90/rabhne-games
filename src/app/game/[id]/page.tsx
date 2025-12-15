@@ -5,9 +5,7 @@ import { MOCK_GAMES } from '@/data/games.mock'
 import { ArrowLeft } from 'lucide-react'
 
 export function generateStaticParams() {
-  return MOCK_GAMES.map((game) => ({
-    id: game.id,
-  }))
+  return []
 }
 
 export default function GamePage({ params }: { params: { id: string } }) {
