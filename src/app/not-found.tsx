@@ -23,14 +23,13 @@ export default function NotFound() {
             </Button>
           </Link>
           
-          <Button 
-            variant="ghost" 
-            size="lg"
-            onClick={() => window.history.back()}
+          <a 
+            href="javascript:history.back()"
+            className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-lg bg-dark-800 hover:bg-dark-700 text-white border border-dark-600 hover:border-dark-500 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 ml-2" />
             العودة للخلف
-          </Button>
+          </a>
         </div>
       </div>
     </MainLayout>
