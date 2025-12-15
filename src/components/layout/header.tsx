@@ -16,7 +16,7 @@ import {
 import { useState } from 'react'
 
 export function Header() {
-  const { user, signOut } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -112,11 +112,13 @@ export function Header() {
                 </div>
               </>
             ) : (
-              <Link href={ROUTES.LOGIN}>
-                <Button variant="primary" size="sm">
-                  تسجيل الدخول
-                </Button>
-              </Link>
+              !loading && (
+                <Link href={ROUTES.LOGIN}>
+                  <Button variant="primary" size="sm">
+                    تسجيل الدخول
+                  </Button>
+                </Link>
+              )
             )}
 
             {/* Mobile Menu Button */}
