@@ -9,6 +9,12 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/components/auth/auth-provider'
 import { MOCK_GAMES } from '@/data/games.mock'
 import { GAME_CATEGORIES, GAME_PROVIDERS, ROUTES, APP_CONFIG } from '@/lib/config'
+
+export function generateStaticParams() {
+  return MOCK_GAMES.map((game) => ({
+    id: game.id,
+  }))
+}
 import { EarningStatus } from '@/types'
 import toast from 'react-hot-toast'
 import {
