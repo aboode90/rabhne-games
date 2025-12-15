@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { MainLayout } from '@/components/layout/main-layout'
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GameCardSkeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
+import { AdSense } from '@/components/ads/adsense'
 import { MOCK_GAMES } from '@/data/games.mock'
 import { GAME_CATEGORIES, GAME_PROVIDERS, ROUTES } from '@/lib/config'
 import { GameFilters } from '@/types'
@@ -173,8 +174,14 @@ export default function GamesPage() {
           </div>
         ) : filteredGames.length > 0 ? (
           <div className="games-grid">
-            {filteredGames.map((game) => (
-              <Card key={game.id} hover className="overflow-hidden">
+            {filteredGames.map((game, index) => (
+              <React.Fragment key={game.id}>
+                {index === 4 && (
+                  <div className="col-span-full mb-6">
+                    <AdSense adSlot="9876543210" adFormat="fluid" style={{ display: 'block', minHeight: '100px' }} />
+                  </div>
+                )}
+                <Card hover className="overflow-hidden">
                 <div className="relative">
                   <div className="aspect-video bg-dark-700 relative overflow-hidden">
                     <Image
@@ -235,6 +242,7 @@ export default function GamesPage() {
                   </div>
                 </CardContent>
               </Card>
+              </React.Fragment>
             ))}
           </div>
         ) : (

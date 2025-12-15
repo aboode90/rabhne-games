@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { MainLayout } from '@/components/layout/main-layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { AdSense } from '@/components/ads/adsense'
 import { ROUTES } from '@/lib/config'
 import {
   Gamepad2,
@@ -83,6 +84,11 @@ export default function HomePage() {
             </main>
           </div>
         </div>
+      </div>
+
+      {/* Banner Ad */}
+      <div className="mb-8">
+        <AdSense adSlot="1234567890" style={{ display: 'block', textAlign: 'center', minHeight: '90px' }} />
       </div>
 
       {/* Stats Section */}

@@ -3,6 +3,7 @@ import { Cairo } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from 'react-hot-toast'
+import Script from 'next/script'
 
 const cairo = Cairo({ 
   subsets: ['arabic', 'latin'],
@@ -66,6 +67,12 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={cairo.variable}>
       <body className={`${cairo.className} bg-dark-900 text-white min-h-screen`}>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5100084329334269"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Providers>
           {children}
           <Toaster
