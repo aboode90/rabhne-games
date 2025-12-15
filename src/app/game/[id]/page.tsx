@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import { MainLayout } from '@/components/layout/main-layout'
-import { Button } from '@/components/ui/button'
 import { GameClient } from '@/components/game/game-client'
 import { MOCK_GAMES } from '@/data/games.mock'
 import { ArrowLeft } from 'lucide-react'
@@ -22,14 +21,10 @@ export default function GamePage({ params }: { params: { id: string } }) {
     <MainLayout>
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => window.history.back()}
-            className="mb-4"
-          >
+          <a href="/games" className="inline-flex items-center px-4 py-2 text-dark-300 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4 ml-2" />
             العودة
-          </Button>
+          </a>
         </div>
 
         <GameClient game={game} />
