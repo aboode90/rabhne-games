@@ -1,8 +1,8 @@
 export interface User {
   uid: string
-  email: string
+  email: string | null
   displayName: string
-  photoURL?: string
+  photoURL?: string | null
   points: number
   pointsToday: number
   status: 'active' | 'suspended' | 'banned'

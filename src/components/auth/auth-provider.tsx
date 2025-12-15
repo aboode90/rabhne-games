@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = userDoc.data()
         setUser({
           uid: firebaseUser.uid,
-          email: firebaseUser.email!,
+          email: firebaseUser.email,
           displayName: firebaseUser.displayName || userData.displayName || 'مستخدم',
           photoURL: firebaseUser.photoURL || userData.photoURL,
           points: userData.points || 0,
