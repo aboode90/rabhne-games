@@ -15,6 +15,16 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const functions = firebase.functions();
+
+// Enable offline persistence for faster loading
+db.enablePersistence({ synchronizeTabs: true })
+  .catch(err => console.log('Persistence failed:', err.code));
+
+// Performance settings
+db.settings({
+  cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+});
+
 window.auth = auth;
 window.db = db;
 window.functions = functions;

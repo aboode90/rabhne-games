@@ -1,78 +1,82 @@
-// Games page functionality - Optimized
+// Games page functionality - Enhanced with UI States
 
 let allGames = [];
 let filteredGames = [];
 let gamesLoaded = false;
+let gamesUIState;
 
-// Optimized games loading with caching
+// Initialize UI state manager
+function initGamesUI() {
+    gamesUIState = createUIState('gamesGrid');
+}
+
+// Fast games loading with cache and state management
 async function loadGames() {
     if (gamesLoaded) return;
     
-    const loadingEl = document.getElementById('loadingGames');
-    const gamesGrid = document.getElementById('gamesGrid');
+    // Show loading skeleton immediately
+    gamesUIState.showLoading('cards', 12);
     
     try {
-        // Show loading
-        if (loadingEl) loadingEl.style.display = 'block';
-        if (gamesGrid) gamesGrid.innerHTML = '';
-        
-        // Use cached data if available
-        const cachedGames = sessionStorage.getItem('gamesCache');
-        const cacheTime = sessionStorage.getItem('gamesCacheTime');
-        const now = Date.now();
-        
-        // Use cache if less than 5 minutes old
-        if (cachedGames && cacheTime && (now - parseInt(cacheTime)) < 300000) {
-            allGames = JSON.parse(cachedGames);
+        // Check cache first (5 min expiry)
+        const cached = getCachedGames();
+        if (cached) {
+            allGames = cached;
             filteredGames = [...allGames];
             displayGames();
             gamesLoaded = true;
-            if (loadingEl) loadingEl.style.display = 'none';
             return;
         }
         
-        // Load from Firebase with optimized query
-        const gamesSnapshot = await db.collection('games')
+        // Fetch with timeout
+        const gamesPromise = db.collection('games')
             .where('active', '==', true)
             .orderBy('title')
             .get();
+            
+        const gamesSnapshot = await fetchWithTimeout(gamesPromise, 8000);
 
         allGames = [];
         gamesSnapshot.forEach(doc => {
-            const gameData = doc.data();
+            const data = doc.data();
             allGames.push({
                 id: doc.id,
-                slug: gameData.slug || doc.id,
-                title: gameData.title || 'لعبة',
-                category: gameData.category || 'other',
-                thumbnail: gameData.thumbnail || null,
-                description: gameData.description || ''
+                slug: data.slug || doc.id,
+                title: data.title || 'لعبة',
+                category: data.category || 'other',
+                thumbnail: data.thumbnail || null,
+                description: data.description || ''
             });
         });
 
-        // Cache the results
-        sessionStorage.setItem('gamesCache', JSON.stringify(allGames));
-        sessionStorage.setItem('gamesCacheTime', now.toString());
+        // Cache results
+        setCachedGames(allGames);
         
         filteredGames = [...allGames];
         displayGames();
         gamesLoaded = true;
 
     } catch (error) {
-        console.error('Error loading games:', error);
-        if (gamesGrid) {
-            gamesGrid.innerHTML = `
-                <div class="no-games">
-                    <div class="no-games-icon">⚠️</div>
-                    <h3>خطأ في التحميل</h3>
-                    <p>حدث خطأ أثناء تحميل الألعاب</p>
-                    <button class="btn btn-primary" onclick="retryLoadGames()">إعادة المحاولة</button>
-                </div>
-            `;
-        }
-    } finally {
-        if (loadingEl) loadingEl.style.display = 'none';
+        console.error('Games loading error:', error);
+        gamesUIState.showError('فشل في تحميل الألعاب');
     }
+}
+
+// Cache helpers
+function getCachedGames() {
+    const cached = sessionStorage.getItem('gamesCache');
+    const cacheTime = sessionStorage.getItem('gamesCacheTime');
+    const now = Date.now();
+    
+    if (cached && cacheTime && (now - parseInt(cacheTime)) < 300000) {
+        return JSON.parse(cached);
+    }
+    return null;
+}
+
+function setCachedGames(games) {
+    sessionStorage.setItem('gamesCache', JSON.stringify(games));
+    sessionStorage.setItem('gamesCacheTime', Date.now().toString());
 }
 
 // Retry loading games
@@ -83,49 +87,38 @@ function retryLoadGames() {
     loadGames();
 }
 
-// Optimized display function
+// Fast display with state management
 function displayGames() {
-    const gamesGrid = document.getElementById('gamesGrid');
-    const noGamesEl = document.getElementById('noGamesFound');
-    
-    if (!gamesGrid) return;
-
     if (filteredGames.length === 0) {
-        gamesGrid.innerHTML = '';
-        if (noGamesEl) noGamesEl.style.display = 'block';
+        gamesUIState.showEmpty('لا توجد ألعاب', '🎮', {
+            text: 'إعادة تحميل',
+            action: 'retryLoadGames()'
+        });
         return;
     }
-
-    if (noGamesEl) noGamesEl.style.display = 'none';
     
-    // Use DocumentFragment for better performance
-    const fragment = document.createDocumentFragment();
-    
-    filteredGames.forEach(game => {
-        const gameCard = document.createElement('div');
-        gameCard.className = 'game-card';
-        gameCard.innerHTML = `
-            <img src="${game.thumbnail || 'https://via.placeholder.com/300x200/3498db/ffffff?text=🎮'}" 
+    // Build games HTML efficiently
+    const gamesHTML = filteredGames.map(game => `
+        <div class="card game-card">
+            <img src="${game.thumbnail || 'img/placeholder.svg'}" 
                  alt="${game.title}" 
                  class="game-image"
                  loading="lazy"
-                 onerror="this.src='https://via.placeholder.com/300x200/3498db/ffffff?text=🎮'">
+                 onerror="this.src='img/placeholder.svg'">
             <div class="game-info">
                 <h3 class="game-title">${game.title}</h3>
                 <div class="game-meta">
-                    <span class="game-category">${getCategoryName(game.category)}</span>
-                    <span class="game-points">+1 نقطة/دقيقة</span>
+                    <span class="badge badge-info">${getCategoryName(game.category)}</span>
+                    <span class="badge badge-success">+1 نقطة/دقيقة</span>
                 </div>
                 <div class="game-actions">
                     <a href="game.html?slug=${game.slug}" class="btn btn-primary">🎮 العب الآن</a>
                 </div>
             </div>
-        `;
-        fragment.appendChild(gameCard);
-    });
+        </div>
+    `).join('');
     
-    gamesGrid.innerHTML = '';
-    gamesGrid.appendChild(fragment);
+    gamesUIState.showData(`<div class="grid grid-4">${gamesHTML}</div>`);
 }
 
 // Filter by category with buttons
@@ -184,16 +177,35 @@ function getCategoryName(category) {
     return categories[category] || category;
 }
 
+// Retry loading
+function retryLoadGames() {
+    gamesLoaded = false;
+    sessionStorage.removeItem('gamesCache');
+    sessionStorage.removeItem('gamesCacheTime');
+    loadGames();
+}
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Load games immediately
+    // Initialize UI state manager
+    initGamesUI();
+    
+    // Load games immediately (not dependent on auth)
     loadGames();
     
-    // Update games count in stats
-    setTimeout(() => {
+    // Update stats when games load
+    const updateStats = () => {
         const totalGamesCount = document.getElementById('totalGamesCount');
         if (totalGamesCount && allGames.length > 0) {
-            totalGamesCount.textContent = `${allGames.length}+`;
+            totalGamesCount.textContent = allGames.length;
         }
-    }, 1000);
+    };
+    
+    // Check periodically for loaded games
+    const statsInterval = setInterval(() => {
+        if (gamesLoaded) {
+            updateStats();
+            clearInterval(statsInterval);
+        }
+    }, 500);
 });

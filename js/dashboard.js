@@ -1,33 +1,46 @@
-// Dashboard functionality - Optimized
+// Dashboard functionality - Enhanced with UI States
 
 let dashboardDataLoaded = false;
+let transactionsUIState, withdrawsUIState;
 
-// Optimized dashboard data loading
+// Initialize UI state managers
+function initDashboardUI() {
+    transactionsUIState = createUIState('recentTransactions');
+    withdrawsUIState = createUIState('withdrawHistory');
+}
+
+// Fast dashboard data loading
 async function loadDashboardData() {
     if (!currentUser || dashboardDataLoaded) return;
     
     try {
-        // Use cached user data if available
-        let userData = getCachedUserData();
+        // Show loading states
+        transactionsUIState.showLoading('list', 3);
+        withdrawsUIState.showLoading('list', 3);
         
-        if (!userData) {
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            userData = userDoc.data();
-        }
+        // Load user data with timeout
+        const userPromise = db.collection('users').doc(currentUser.uid).get();
+        const userDoc = await fetchWithTimeout(userPromise, 5000);
+        const userData = userDoc.data();
         
-        if (!userData) return;
+        if (!userData) throw new Error('لم يتم العثور على بيانات المستخدم');
         
-        // Update user info immediately
+        // Update UI immediately
         updateDashboardUI(userData);
         
-        // Load additional data in background
-        loadAdditionalData();
+        // Load additional data in parallel
+        await batchFirebaseOps([
+            loadRecentTransactions(),
+            loadWithdrawHistory()
+        ]);
         
         dashboardDataLoaded = true;
         
     } catch (error) {
-        console.error('Error loading dashboard data:', error);
-        showMessage('حدث خطأ في تحميل البيانات', 'error');
+        console.error('Dashboard loading error:', error);
+        transactionsUIState.showError();
+        withdrawsUIState.showError();
+        showMessage('فشل في تحميل بيانات لوحة التحكم', 'error');
     }
 }
 
@@ -88,156 +101,122 @@ async function loadAdditionalData() {
     }
 }
 
-// Optimized transactions loading
+// Fast transactions loading with state management
 async function loadRecentTransactions() {
     if (!currentUser) return;
     
-    const transactionsList = document.getElementById('recentTransactions');
-    if (!transactionsList) return;
-    
     try {
-        // Check cache first
-        const cacheKey = `transactions_${currentUser.uid}`;
-        const cachedData = sessionStorage.getItem(cacheKey);
-        const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
-        const now = Date.now();
-        
-        // Use cache if less than 1 minute old
-        if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 60000) {
-            transactionsList.innerHTML = cachedData;
-            return;
-        }
-        
-        const transactionsSnapshot = await db.collection('transactions')
+        const transactionsPromise = db.collection('transactions')
             .where('uid', '==', currentUser.uid)
             .orderBy('createdAt', 'desc')
             .limit(5)
             .get();
+            
+        const snapshot = await fetchWithTimeout(transactionsPromise, 5000);
 
-        if (transactionsSnapshot.empty) {
-            const html = '<div class="no-data">📊 لا توجد عمليات حديثة</div>';
-            transactionsList.innerHTML = html;
+        if (snapshot.empty) {
+            transactionsUIState.showEmpty('لا توجد عمليات', '📊');
             return;
         }
 
-        let html = '';
-        transactionsSnapshot.forEach(doc => {
-            const transaction = doc.data();
-            const sign = transaction.pointsDelta > 0 ? '+' : '';
-            const color = transaction.pointsDelta > 0 ? '#27ae60' : '#e74c3c';
-            const icon = transaction.pointsDelta > 0 ? '📈' : '📉';
+        const transactionsHTML = snapshot.docs.map(doc => {
+            const tx = doc.data();
+            const isPositive = tx.pointsDelta > 0;
+            const sign = isPositive ? '+' : '';
+            const badgeClass = isPositive ? 'badge-success' : 'badge-error';
+            const icon = isPositive ? '📈' : '📉';
 
-            html += `
-                <div class="transaction-item">
-                    <div class="transaction-info">
-                        <div class="transaction-note">${icon} ${transaction.note}</div>
-                        <div class="transaction-time">${formatTime(transaction.createdAt)}</div>
-                    </div>
-                    <div class="transaction-amount" style="color: ${color};">
-                        ${sign}${transaction.pointsDelta.toLocaleString()} نقطة
+            return `
+                <div class="card" style="padding: var(--space-md); margin-bottom: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500;">${icon} ${tx.note || 'عملية'}</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">${formatTime(tx.createdAt)}</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${sign}${tx.pointsDelta.toLocaleString()} نقطة</span>
                     </div>
                 </div>
             `;
-        });
+        }).join('');
 
-        transactionsList.innerHTML = html;
-        
-        // Cache the result
-        sessionStorage.setItem(cacheKey, html);
-        sessionStorage.setItem(`${cacheKey}_time`, now.toString());
+        transactionsUIState.showData(transactionsHTML);
 
     } catch (error) {
-        console.error('Error loading transactions:', error);
-        transactionsList.innerHTML = '<div class="error-message">⚠️ حدث خطأ في تحميل العمليات</div>';
+        console.error('Transactions loading error:', error);
+        transactionsUIState.showError('فشل في تحميل العمليات');
     }
 }
 
-// Optimized withdraw history loading
+// Fast withdraw history loading with state management
 async function loadWithdrawHistory() {
     if (!currentUser) return;
     
-    const withdrawList = document.getElementById('withdrawHistory');
-    if (!withdrawList) return;
-    
     try {
-        // Check cache first
-        const cacheKey = `withdraws_${currentUser.uid}`;
-        const cachedData = sessionStorage.getItem(cacheKey);
-        const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
-        const now = Date.now();
-        
-        // Use cache if less than 1 minute old
-        if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 60000) {
-            withdrawList.innerHTML = cachedData;
-            return;
-        }
-        
-        const withdrawsSnapshot = await db.collection('withdraw_requests')
+        const withdrawsPromise = db.collection('withdraw_requests')
             .where('uid', '==', currentUser.uid)
             .orderBy('createdAt', 'desc')
             .limit(5)
             .get();
+            
+        const snapshot = await fetchWithTimeout(withdrawsPromise, 5000);
 
-        if (withdrawsSnapshot.empty) {
-            const html = '<div class="no-data">💰 لا توجد طلبات سحب</div>';
-            withdrawList.innerHTML = html;
+        if (snapshot.empty) {
+            withdrawsUIState.showEmpty('لا توجد طلبات سحب', '💰');
             return;
         }
 
-        let html = '';
-        withdrawsSnapshot.forEach(doc => {
-            const withdraw = doc.data();
-            const statusInfo = getStatusInfo(withdraw.status);
+        const withdrawsHTML = snapshot.docs.map(doc => {
+            const wr = doc.data();
+            const statusInfo = getStatusInfo(wr.status);
 
-            html += `
-                <div class="withdraw-item">
-                    <div class="withdraw-info">
-                        <div class="withdraw-amount">${withdraw.amountPoints.toLocaleString()} نقطة</div>
-                        <div class="withdraw-method">${withdraw.method} - ${formatTime(withdraw.createdAt)}</div>
-                        ${withdraw.adminNote ? `<div class="withdraw-note">📝 ${withdraw.adminNote}</div>` : ''}
-                    </div>
-                    <div class="withdraw-status">
-                        <span class="status-badge ${statusInfo.class}">${statusInfo.icon} ${statusInfo.text}</span>
-                        <div class="withdraw-cash">$${withdraw.amountCash.toFixed(2)}</div>
+            return `
+                <div class="card" style="padding: var(--space-md); margin-bottom: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500;">${wr.amountUSDT || wr.amountCash} USDT</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">${formatTime(wr.createdAt)}</div>
+                            ${wr.adminNote ? `<div style="font-size: 0.75rem; color: var(--text-muted);">📝 ${wr.adminNote}</div>` : ''}
+                        </div>
+                        <span class="badge ${statusInfo.class}">${statusInfo.icon} ${statusInfo.text}</span>
                     </div>
                 </div>
             `;
-        });
+        }).join('');
 
-        withdrawList.innerHTML = html;
-        
-        // Cache the result
-        sessionStorage.setItem(cacheKey, html);
-        sessionStorage.setItem(`${cacheKey}_time`, now.toString());
+        withdrawsUIState.showData(withdrawsHTML);
 
     } catch (error) {
-        console.error('Error loading withdraw history:', error);
-        withdrawList.innerHTML = '<div class="error-message">⚠️ حدث خطأ في تحميل طلبات السحب</div>';
+        console.error('Withdraws loading error:', error);
+        withdrawsUIState.showError('فشل في تحميل طلبات السحب');
     }
 }
 
-// Get status info with icon and styling
+// Get status info with badge classes
 function getStatusInfo(status) {
     const statusMap = {
-        'pending': { text: 'معلق', icon: '⏳', class: 'status-pending' },
-        'approved': { text: 'موافق عليه', icon: '✅', class: 'status-approved' },
-        'rejected': { text: 'مرفوض', icon: '❌', class: 'status-rejected' }
+        'pending': { text: 'معلق', icon: '⏳', class: 'badge-warning' },
+        'approved': { text: 'موافق', icon: '✅', class: 'badge-success' },
+        'rejected': { text: 'مرفوض', icon: '❌', class: 'badge-error' },
+        'paid': { text: 'مدفوع', icon: '💰', class: 'badge-success' }
     };
     
-    return statusMap[status] || { text: status, icon: '❓', class: 'status-unknown' };
+    return statusMap[status] || { text: status, icon: '❓', class: 'badge-info' };
 }
 
 // Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize UI state managers
+    initDashboardUI();
+    
     // Load immediately if user is already authenticated
     if (currentUser) {
         loadDashboardData();
     }
     
-    // Also listen for auth state changes
+    // Listen for auth state changes
     auth.onAuthStateChanged((user) => {
         if (user && !dashboardDataLoaded) {
-            setTimeout(loadDashboardData, 500);
+            setTimeout(loadDashboardData, 300);
         }
     });
 });

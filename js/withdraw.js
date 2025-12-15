@@ -1,29 +1,45 @@
-// Withdraw page functionality
+// Withdraw page functionality - Enhanced with UI States
 
-// Real-time listener for stats
-let statsUnsubscribe = null;
+let withdrawHistoryUIState;
+let withdrawDataLoaded = false;
 
-async function setupRealtimeStats() {
-    if (!currentUser) return;
+// Initialize UI state managers
+function initWithdrawUI() {
+    withdrawHistoryUIState = createUIState('withdrawHistoryList');
+}
 
-    // Stop previous listener if exists
-    if (statsUnsubscribe) {
-        statsUnsubscribe();
+// Fast withdraw data loading
+async function loadWithdrawData() {
+    if (!currentUser || withdrawDataLoaded) return;
+    
+    try {
+        // Show loading state
+        withdrawHistoryUIState.showLoading('list', 5);
+        
+        // Load user stats and history in parallel
+        const [userDoc, historySnapshot] = await batchFirebaseOps([
+            db.collection('users').doc(currentUser.uid).get(),
+            db.collection('withdraw_requests')
+                .where('uid', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(10)
+                .get()
+        ]);
+        
+        // Update stats
+        if (userDoc.exists) {
+            updateWithdrawStats(userDoc.data());
+        }
+        
+        // Display history
+        displayWithdrawHistory(historySnapshot);
+        
+        withdrawDataLoaded = true;
+        
+    } catch (error) {
+        console.error('Withdraw data loading error:', error);
+        withdrawHistoryUIState.showError('فشل في تحميل بيانات السحب');
     }
-
-    // Start new listener
-    statsUnsubscribe = db.collection('users').doc(currentUser.uid)
-        .onSnapshot((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                updateWithdrawStats(userData);
-            }
-        }, (error) => {
-            console.error('Error listening to stats:', error);
-        });
-
-    // Also load history once
-    loadWithdrawHistory();
 }
 
 function updateWithdrawStats(userData) {
@@ -94,89 +110,73 @@ async function submitWithdrawRequest(e) {
     }
 }
 
-// Load withdraw history
-async function loadWithdrawHistory() {
-    if (!currentUser) return;
+// Display withdraw history with state management
+function displayWithdrawHistory(snapshot) {
+    if (snapshot.empty) {
+        withdrawHistoryUIState.showEmpty('لا توجد طلبات سحب', '💰', {
+            text: 'إنشاء طلب جديد',
+            action: 'document.getElementById("withdrawAmount").focus()'
+        });
+        return;
+    }
 
-    try {
-        const withdrawsSnapshot = await db.collection('withdraw_requests')
-            .where('uid', '==', currentUser.uid)
-            .orderBy('createdAt', 'desc')
-            .get();
+    const historyHTML = snapshot.docs.map(doc => {
+        const wr = doc.data();
+        const statusInfo = getStatusInfo(wr.status);
+        const amount = wr.amountUSDT || wr.amountCash || (wr.amountPoints / 10000);
 
-        const historyList = document.getElementById('withdrawHistoryList');
-
-        if (withdrawsSnapshot.empty) {
-            historyList.innerHTML = '<p>لا توجد طلبات سحب سابقة</p>';
-            return;
-        }
-
-        let html = '';
-        withdrawsSnapshot.forEach(doc => {
-            const withdraw = doc.data();
-            const statusClass = `status-${withdraw.status}`;
-            const statusText = getStatusText(withdraw.status);
-
-            html += `
-                <div class="withdraw-item">
-                    <div class="withdraw-details">
-                        <h4>${withdraw.amountPoints.toLocaleString()} نقطة</h4>
-                        <p><strong>الطريقة:</strong> ${withdraw.method}</p>
-                        <p><strong>المحفظة:</strong> ${withdraw.account}</p>
-                        <p><strong>التاريخ:</strong> ${formatTime(withdraw.createdAt)}</p>
-                        ${withdraw.adminNote ? `<p style="margin-top:5px; color:#e74c3c;"><strong>ملاحظة الإدارة:</strong> ${withdraw.adminNote}</p>` : ''}
+        return `
+            <div class="card" style="margin-bottom: var(--space-md);">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: var(--space-sm);">
+                            $${amount.toFixed(2)} USDT
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-xs);">
+                            📅 ${formatTime(wr.createdAt)}
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-xs);">
+                            🏦 ${(wr.walletTRC20 || wr.account || '').substring(0, 20)}...
+                        </div>
+                        ${wr.adminNote ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: var(--space-sm);">📝 ${wr.adminNote}</div>` : ''}
                     </div>
-                    <div class="withdraw-status">
-                        <span class="${statusClass}">${statusText}</span>
-                        <div class="withdraw-amount">$${withdraw.amountCash.toFixed(2)}</div>
+                    <div style="text-align: left;">
+                        <span class="badge ${statusInfo.class}">${statusInfo.icon} ${statusInfo.text}</span>
                     </div>
                 </div>
-            `;
-        });
+            </div>
+        `;
+    }).join('');
 
-        historyList.innerHTML = html;
-
-    } catch (error) {
-        console.error('Error loading withdraw history:', error);
-        document.getElementById('withdrawHistoryList').innerHTML = '<p>حدث خطأ أثناء التحميل</p>';
-    }
+    withdrawHistoryUIState.showData(historyHTML);
 }
 
-// Get status text in Arabic
-function getStatusText(status) {
-    const statuses = {
-        'pending': 'قيد المراجعة',
-        'approved': 'تم الموافقة',
-        'rejected': 'مرفوض'
+// Get status info with badge classes
+function getStatusInfo(status) {
+    const statusMap = {
+        'pending': { text: 'قيد المراجعة', icon: '⏳', class: 'badge-warning' },
+        'approved': { text: 'موافق عليه', icon: '✅', class: 'badge-success' },
+        'rejected': { text: 'مرفوض', icon: '❌', class: 'badge-error' },
+        'paid': { text: 'مدفوع', icon: '💰', class: 'badge-success' }
     };
-
-    return statuses[status] || status;
+    
+    return statusMap[status] || { text: status, icon: '❓', class: 'badge-info' };
 }
 
 // Initialize withdraw page
 document.addEventListener('DOMContentLoaded', function () {
-    // Wait for auth to initialize
-    setTimeout(() => {
-        if (requireAuth()) {
-            setupRealtimeStats();
+    // Initialize UI state managers
+    initWithdrawUI();
+    
+    // Load data if user is already authenticated
+    if (currentUser) {
+        loadWithdrawData();
+    }
+    
+    // Listen for auth state changes
+    auth.onAuthStateChanged((user) => {
+        if (user && !withdrawDataLoaded) {
+            setTimeout(loadWithdrawData, 300);
         }
-    }, 1000);
-
-    // Add event listeners
-    const withdrawForm = document.getElementById('withdrawForm');
-    if (withdrawForm) {
-        withdrawForm.addEventListener('submit', submitWithdrawRequest);
-    }
-
-    const withdrawPoints = document.getElementById('withdrawPoints');
-    if (withdrawPoints) {
-        withdrawPoints.addEventListener('input', calculateCash);
-    }
-});
-
-// Listen for auth state changes
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        setupRealtimeStats();
-    }
+    });
 });
