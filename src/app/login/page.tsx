@@ -56,7 +56,7 @@ export default function LoginPage() {
         await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         toast.success('تم إنشاء الحساب بنجاح!')
       }
-      router.push(ROUTES.DASHBOARD)
+      // Redirect will happen automatically via useEffect when user state changes
     } catch (error: any) {
       console.error('Auth error:', error)
       
@@ -83,7 +83,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
       toast.success('تم تسجيل الدخول بنجاح!')
-      router.push(ROUTES.DASHBOARD)
+      // Redirect will happen automatically via useEffect when user state changes
     } catch (error: any) {
       console.error('Google auth error:', error)
       
