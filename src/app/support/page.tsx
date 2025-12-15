@@ -1,6 +1,7 @@
 import { MainLayout } from '@/components/layout/main-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { AdSense } from '@/components/ads/adsense'
 import {
   HelpCircle,
   Mail,
@@ -103,13 +104,25 @@ export default function SupportPage() {
           <CardContent>
             <div className="space-y-6">
               {faqs.map((faq, index) => (
-                <div key={index} className="border-b border-dark-700 last:border-b-0 pb-6 last:pb-0">
-                  <h3 className="text-lg font-semibold text-white mb-3">
-                    {faq.question}
-                  </h3>
-                  <p className="text-dark-300 leading-relaxed">
-                    {faq.answer}
-                  </p>
+                <div key={index}>
+                  <div className="border-b border-dark-700 pb-6">
+                    <h3 className="text-lg font-semibold text-white mb-3">
+                      {faq.question}
+                    </h3>
+                    <p className="text-dark-300 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                  {index === 2 && (
+                    <div className="my-8">
+                      <AdSense 
+                        adSlot="6130767765" 
+                        adFormat="fluid"
+                        adLayout="in-article"
+                        style={{ display: 'block', textAlign: 'center', minHeight: '100px' }}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
